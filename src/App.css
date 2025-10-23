@@ -1,12 +1,16 @@
 .container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 560px;
+  width: 100%;
+  margin: 2rem;
+  padding: 2.5rem;
   text-align: center;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   text-align: left;
 }
 
@@ -14,56 +18,78 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  color: #555;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.8rem 1rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  box-sizing: border-box; /* Ensures padding doesn't affect width */
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-button[type="submit"] {
+.form-group input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
+}
+
+button {
   width: 100%;
-  padding: 0.75rem;
-  font-size: 1.1rem;
+  padding: 0.8rem;
+  font-size: 1.05rem;
+  background-color: #4f46e5;
+}
+
+button:hover {
+  background-color: #4338ca;
 }
 
 button:disabled {
-  background-color: #ccc;
+  background-color: #a5b4fc;
   cursor: not-allowed;
 }
 
 .error {
-  color: #d32f2f;
-  margin-top: 1rem;
-  font-weight: bold;
+  color: #ef4444;
+  background-color: #fee2e2;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  font-weight: 500;
 }
 
 .result {
   margin-top: 2rem;
   padding: 1.5rem;
-  border: 1px solid #ddd;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.result p {
+  margin: 0 0 0.75rem 0;
+  font-weight: 500;
 }
 
 .result a {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #3b82f6;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4f46e5;
+  word-break: break-all;
 }
 
 button.secondary {
-  background-color: transparent;
-  color: #555;
-  border: 1px solid #ccc;
-  margin-top: 0.5rem;
+  background-color: #e2e8f0;
+  color: #334155;
+  border: 1px solid transparent;
+  margin-top: 0.75rem;
 }
 
 button.secondary:hover {
-  background-color: #f9f9f9;
-  border-color: #bbb;
+  background-color: #cbd5e1;
 }

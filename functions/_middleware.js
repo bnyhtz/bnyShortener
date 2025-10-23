@@ -5,7 +5,15 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const path = url.pathname.slice(1); // Remove leading '/'
 
-  // 1. Ignore paths for the API and static assets
+  // 1. Check for KV binding first
+  if (!env.LINKS) {
+    // This won't be visible to the user but is good for server-side logs.
+    console.error('KV Namespace "LINKS" is not bound.');
+    // Allow the request to proceed to the frontend, which can show a proper error.
+    return await next();
+  }
+
+  // 2. Ignore paths for the API and static assets
   if (path.startsWith('api/') || path.startsWith('assets/')) {
     return await next();
   }

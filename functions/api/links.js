@@ -20,6 +20,14 @@ function generateRandomPath(length = 6) {
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
+
+    if (!env.LINKS) {
+      return new Response(JSON.stringify({ error: 'KV Namespace "LINKS" is not bound. Please check your Cloudflare Pages project settings.' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const { url, customPath } = await request.json();
 
     // 1. Validate URL
@@ -73,6 +81,14 @@ export async function onRequestPost(context) {
 export async function onRequestPut(context) {
   try {
     const { request, env } = context;
+
+    if (!env.LINKS) {
+      return new Response(JSON.stringify({ error: 'KV Namespace "LINKS" is not bound. Please check your Cloudflare Pages project settings.' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const { url, path } = await request.json();
 
     // 1. Validate input
