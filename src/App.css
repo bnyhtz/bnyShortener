@@ -1,75 +1,58 @@
 .container {
-  max-width: 560px;
   width: 100%;
-  margin: 2rem;
-  padding: 2.5rem;
-  text-align: center;
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  position: relative;
+  max-width: 800px;
+  margin: 0 1rem;
 }
 
 .header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  margin-bottom: 1rem;
-}
-
-.header h1 {
-  margin: 0;
-}
-
-.settings-button {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  width: auto;
-  color: #9ca3af;
-}
-
-.settings-button:hover {
-  color: #111;
-}
-
-.settings-button svg {
-  width: 24px;
-  height: 24px;
-}
-
-.settings-panel {
-  padding: 1.5rem;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background-color: #f8fafc;
-  text-align: left;
-}
-
-.settings-panel h2 {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  font-size: 1.2rem;
-}
-
-.setting-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
 
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #E9EDF1;
+}
+
+.card-header.collapsible {
+  cursor: pointer;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.card-header .chevron {
+  transition: transform 0.2s;
+}
+
+.card-header .chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+}
+
 .setting-item label {
-  font-weight: 500;
-  color: #334155;
+  font-weight: 700;
+  color: #0B1A3D;
 }
 
 /* The switch - https://www.w3schools.com/howto/howto_css_switch.asp */
@@ -111,136 +94,137 @@
 }
 
 input:checked + .slider {
-  background-color: #4f46e5;
+  background-color: #0056FF;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #4f46e5;
+  box-shadow: 0 0 1px #0056FF;
 }
 
 input:checked + .slider:before {
   transform: translateX(22px);
 }
 
+.card-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
 .form-group {
-  margin-bottom: 1.25rem;
-  text-align: left;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #555;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #566280;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.8rem 1rem;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid #A5B1C9;
+  border-radius: 4px;
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-group input:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: #0056FF;
+  box-shadow: 0 0 0 3px rgba(0, 86, 255, 0.2);
   outline: none;
 }
 
-button {
-  width: 100%;
-  padding: 0.8rem;
-  font-size: 1.05rem;
-  background-color: #4f46e5;
+.short-link-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-button:hover {
-  background-color: #4338ca;
+.short-link-group .domain-select {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid #A5B1C9;
+  border-radius: 4px;
+  background-color: #F8F9FC;
+  font-weight: 700;
+  color: #0B1A3D;
 }
 
-button:disabled {
-  background-color: #a5b4fc;
+.short-link-group span {
+  color: #A5B1C9;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #E9EDF1;
+}
+
+button.primary {
+  background-color: #0056FF;
+  color: #ffffff;
+}
+
+button.primary:hover {
+  background-color: #0045cc;
+}
+
+button.primary:disabled {
+  background-color: #A5B1C9;
   cursor: not-allowed;
 }
 
+button.secondary {
+  background-color: transparent;
+  color: #566280;
+  border: none;
+}
+
+button.secondary:hover {
+  color: #0B1A3D;
+}
+
 .error {
-  color: #ef4444;
-  background-color: #fee2e2;
-  padding: 0.8rem 1rem;
-  border-radius: 8px;
+  color: #d93025;
+  background-color: #fbe9e7;
+  padding: 1rem;
+  border-radius: 4px;
   margin-top: 1.5rem;
   font-weight: 500;
+  text-align: left;
 }
 
 .result {
   margin-top: 2rem;
   padding: 1.5rem;
   border-radius: 8px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background-color: #F8F9FC;
+  border: 1px solid #E9EDF1;
   text-align: left;
 }
 
 .result p {
   margin: 0 0 0.75rem 0;
-  font-weight: 500;
+  font-weight: 700;
+  color: #0B1A3D;
 }
 
 .result a {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #4f46e5;
+  color: #0056FF;
   word-break: break-all;
+  text-decoration: none;
 }
 
-button.secondary {
-  background-color: #e2e8f0;
-  color: #334155;
-  border: 1px solid transparent;
-  margin-top: 0.75rem;
-}
-
-button.secondary:hover {
-  background-color: #cbd5e1;
-}
-
-.edit-prompt {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-  text-align: center;
-}
-
-.edit-button {
-  background: none;
-  border: none;
-  color: #64748b;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0.25rem;
-  font-size: 0.9rem;
-  display: inline;
-  width: auto;
-}
-
-.edit-button:hover {
+.result a:hover {
   text-decoration: underline;
-}
-
-.inline-edit-form {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.inline-edit-form .form-group {
-  margin-bottom: 1rem;
-}
-
-.inline-edit-form .form-actions {
-  display: flex;
-  gap: 0.5rem;
 }

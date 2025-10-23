@@ -1,11 +1,9 @@
 :root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'DM Sans', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color: #333;
+  color: #0B1A3D;
   background-color: #f0f2f5;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -16,9 +14,10 @@ body {
   margin: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding-top: 4rem;
   min-height: 100vh;
   width: 100%;
+  box-sizing: border-box;
 }
 
 #root {
@@ -28,28 +27,20 @@ body {
 }
 
 h1 {
-  font-size: 2.2em;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-  color: #111;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  color: #0B1A3D;
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid transparent;
-  padding: 0.7em 1.3em;
-  font-size: 1em;
-  font-weight: 500;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  font-weight: 700;
   font-family: inherit;
-  background-color: #1a1a1a;
-  color: #fff;
   cursor: pointer;
-  transition: background-color 0.25s, border-color 0.25s;
-}
-button:hover {
-  background-color: #333;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
