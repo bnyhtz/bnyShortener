@@ -157,6 +157,88 @@ input:checked + .slider:before {
   color: #0B1A3D;
 }
 
+.short-link-group .domain-select select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-weight: 700;
+  color: #0B1A3D;
+  font-size: 1rem;
+}
+
+.domain-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  color: #566280;
+  background: #eef2ff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copy-btn {
+  background: transparent;
+  border: 1px solid #E9EDF1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #0B1A3D;
+}
+
+.copy-btn:hover { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+
+.open-btn {
+  background: #0056FF;
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.open-btn:hover { background: #0045cc; }
+
+.small-muted {
+  font-size: 0.85rem;
+  color: #566280;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0,0,0,0.08);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { from { transform: rotate(0deg);} to { transform: rotate(360deg);} }
+
+.result-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+
+.toast {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  background: #111827;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.5);
+  z-index: 9999;
+}
+
 .short-link-group span {
   color: #A5B1C9;
 }

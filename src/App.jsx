@@ -10,6 +10,8 @@ function App() {
   // Form State
   const [url, setUrl] = useState('');
   const [customPath, setCustomPath] = useState('');
+  const [domains, setDomains] = useState([]);
+  const [selectedDomain, setSelectedDomain] = useState(window.location.host);
   const [isPathValid, setIsPathValid] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,6 +23,12 @@ function App() {
   const [metadataDescription, setMetadataDescription] = useState('');
   const [metadataImage, setMetadataImage] = useState('');
   const [enableCloaking, setEnableCloaking] = useState(false);
+  // Toast notification
+  const [toast, setToast] = useState(null);
+  const showToast = (msg, ms = 2500) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), ms);
+  };
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -38,6 +46,25 @@ function App() {
       }
     };
     checkAuthStatus();
+
+    // Fetch available domains for the domain chooser
+    (async () => {
+      try {
+        const resp = await fetch('/api/domains', { cache: 'no-store' });
+        if (!resp.ok) return;
+        const data = await resp.json();
+          if (data && Array.isArray(data.domains) && data.domains.length > 0) {
+            setDomains(data.domains);
+            // Restore last chosen domain from localStorage or pick a sensible default
+            const host = window.location.host;
+            const saved = window.localStorage.getItem('lastSelectedDomain');
+            const pick = saved && data.domains.includes(saved) ? saved : (data.domains.includes(host) ? host : data.domains[0]);
+            setSelectedDomain(pick);
+        }
+      } catch (e) {
+        // ignore - domains are optional
+      }
+    })();
   }, []);
 
   const handlePasswordSubmit = async (event) => {
@@ -90,6 +117,9 @@ function App() {
         headers['X-Link-Shortener-Password'] = sessionPassword;
       }
 
+        // persist chosen domain
+        try { window.localStorage.setItem('lastSelectedDomain', selectedDomain); } catch (e) {}
+
       const response = await fetch('/api/links', {
         method: 'POST',
         headers: headers,
@@ -99,6 +129,7 @@ function App() {
           embeds: enableEmbeds,
           metadata,
           cloaking: enableCloaking,
+          domain: selectedDomain,
         }),
       });
 
@@ -187,7 +218,17 @@ function App() {
           <div className="form-group">
             <label>Short link</label>
             <div className="short-link-group">
-              <div className="domain-select">{window.location.host}</div>
+              <div className="domain-select">
+                {domains.length > 0 ? (
+                  <select value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)}>
+                    {domains.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                ) : (
+                  window.location.host
+                )}
+              </div>
               <span>/</span>
               <input
                 type="text"
@@ -212,9 +253,6 @@ function App() {
               </p>
             )}
           </div>
-        </div>
-
-        <div className="card">
           <div className="card-header collapsible" onClick={() => setShowAdvanced(!showAdvanced)}>
             <h2>Advanced settings</h2>
             <svg className={`chevron ${showAdvanced ? 'expanded' : ''}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -305,7 +343,9 @@ function App() {
             Cancel
           </button>
           <button type="submit" className="primary" disabled={loading}>
-            {loading ? 'Creating...' : 'Create your link'}
+            {loading ? (
+              <span className="btn-icon"><span className="spinner"></span> Creating...</span>
+            ) : 'Create your link'}
           </button>
         </div>
       </form>
@@ -315,12 +355,26 @@ function App() {
       {result && !error && (
         <div className="result">
           <p>Your shortened link is ready!</p>
-          <a href={result.shortUrl} target="_blank" rel="noopener noreferrer">
-            {result.shortUrl}
-          </a>
+            <a href={result.shortUrl} target="_blank" rel="noopener noreferrer">
+              {result.shortUrl}
+            </a>
+            <div className="result-actions">
+              <button className="copy-btn" onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(result.shortUrl);
+                  showToast('Copied to clipboard');
+                } catch (e) {
+                  showToast('Could not copy');
+                }
+              }}>Copy</button>
+              <button className="open-btn" onClick={() => window.open(result.shortUrl, '_blank')}>Open</button>
+              <span className="small-muted">Path: <strong>{result.path}</strong></span>
+            </div>
         </div>
       )}
-    </div>
+
+        {toast && <div className="toast">{toast}</div>}
+      </div>
   );
 }
 

@@ -39,7 +39,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    let { url, customPath, embeds, metadata, cloaking } = await request.json();
+  let { url, customPath, embeds, metadata, cloaking, domain } = await request.json();
 
     // 1. Validate and normalize URL
     if (!url) {
@@ -80,10 +80,29 @@ export async function onRequestPost(context) {
     };
     await env.LINKS.put(path, JSON.stringify(linkData));
 
-    // 5. Return the successful response
-    const baseUrl = new URL(request.url);
-    baseUrl.pathname = path; // Set the pathname to just the short path
-    const shortUrl = baseUrl.toString();
+    // 5. Determine the base host for the short URL. If a domain was provided,
+    // validate it against the env.DOMAINS list (if present). Otherwise fall back
+    // to the request host.
+    let baseHost;
+    if (domain) {
+      // If DOMAINS is set in the environment, only allow domains from that list
+      if (env && env.DOMAINS) {
+        const allowed = env.DOMAINS.split(',').map(s => s.trim()).filter(Boolean);
+        if (!allowed.includes(domain)) {
+          return new Response(JSON.stringify({ error: 'The specified domain is not allowed.' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+      }
+      baseHost = domain;
+    } else {
+      // Use request host
+      const urlObj = new URL(request.url);
+      baseHost = urlObj.host;
+    }
+
+    const shortUrl = `https://${baseHost}/${path}`;
     
     return new Response(JSON.stringify({
       originalUrl: url,
