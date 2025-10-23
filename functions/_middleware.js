@@ -34,25 +34,59 @@ export async function onRequest(context) {
         return await next();
       }
 
-      // 4. Check if the visitor is a bot
+      // 4. Check for link cloaking first
+      if (linkData.cloaking) {
+        return new Response(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>${linkData.metadata?.title || 'Link'}</title>
+              <meta name="description" content="${linkData.metadata?.description || ''}">
+              ${linkData.metadata?.image ? `<link rel="icon" href="${linkData.metadata.image}">` : ''}
+              <style>
+                body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+                iframe { width: 100%; height: 100%; border: none; }
+              </style>
+            </head>
+            <body>
+              <iframe src="${linkData.url}"></iframe>
+            </body>
+          </html>
+        `, { headers: { 'Content-Type': 'text/html' } });
+      }
+
+      // 5. Check if the visitor is a bot for metadata embeds
       const userAgent = request.headers.get('User-Agent') || '';
       const isBot = /bot|facebook|embed|got|firefox\/92|firefox\/38|curl|wget|go-http-client|yahoo|bing|google|spider|slack|whatsapp|twitter|discord/i.test(userAgent);
 
-      // 5. If it's a bot, check the embed setting
       if (isBot) {
-        // Explicitly check for `embeds: false`. If the property doesn't exist (old links), default to true.
         const embedsDisabled = linkData.embeds === false;
         console.log(`Bot detected for path: /${path}. User-Agent: ${userAgent}. Embeds disabled: ${embedsDisabled}`);
 
         if (embedsDisabled) {
-          // Serve a blank HTML page to prevent an embed from being generated
-          return new Response('<!DOCTYPE html><title></title>', {
-            headers: { 'Content-Type': 'text/html' },
-          });
+          return new Response('<!DOCTYPE html><title></title>', { headers: { 'Content-Type': 'text/html' } });
+        }
+
+        // Serve custom metadata if it exists
+        if (linkData.metadata) {
+          return new Response(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>${linkData.metadata.title || ''}</title>
+                <meta name="description" content="${linkData.metadata.description || ''}">
+                <meta property="og:title" content="${linkData.metadata.title || ''}">
+                <meta property="og:description" content="${linkData.metadata.description || ''}">
+                ${linkData.metadata.image ? `<meta property="og:image" content="${linkData.metadata.image}">` : ''}
+                <meta name="twitter:card" content="summary_large_image">
+              </head>
+              <body></body>
+            </html>
+          `, { headers: { 'Content-Type': 'text/html' } });
         }
       }
 
-      // 6. For all regular users and bots with embeds enabled, perform the redirect
+      // 6. For all regular users, perform the redirect
       return Response.redirect(linkData.url, 302);
     }
   } catch (error) {

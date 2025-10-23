@@ -9,6 +9,11 @@ function App() {
   const [result, setResult] = useState(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [enableEmbeds, setEnableEmbeds] = useState(true);
+  const [enableMetadata, setEnableMetadata] = useState(false);
+  const [metadataTitle, setMetadataTitle] = useState('');
+  const [metadataDescription, setMetadataDescription] = useState('');
+  const [metadataImage, setMetadataImage] = useState('');
+  const [enableCloaking, setEnableCloaking] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -16,11 +21,23 @@ function App() {
     setError(null);
     setResult(null);
 
+    const metadata = enableMetadata ? {
+      title: metadataTitle,
+      description: metadataDescription,
+      image: metadataImage,
+    } : null;
+
     try {
       const response = await fetch('/api/links', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, customPath, embeds: enableEmbeds }),
+        body: JSON.stringify({
+          url,
+          customPath,
+          embeds: enableEmbeds,
+          metadata,
+          cloaking: enableCloaking,
+        }),
       });
 
       const data = await response.json();
@@ -42,6 +59,11 @@ function App() {
     setCustomPath('');
     setError(null);
     setResult(null);
+    setEnableMetadata(false);
+    setMetadataTitle('');
+    setMetadataDescription('');
+    setMetadataImage('');
+    setEnableCloaking(false);
   };
 
   return (
@@ -90,18 +112,78 @@ function App() {
             <svg className={`chevron ${showAdvanced ? 'expanded' : ''}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
           {showAdvanced && (
-            <div className="setting-item">
-              <label htmlFor="embed-toggle">Enable link previews (embeds)</label>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  id="embed-toggle"
-                  checked={enableEmbeds}
-                  onChange={() => setEnableEmbeds(!enableEmbeds)}
-                />
-                <span className="slider"></span>
-              </label>
-            </div>
+            <>
+              <div className="setting-item">
+                <label htmlFor="embed-toggle">Enable link previews (embeds)</label>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    id="embed-toggle"
+                    checked={enableEmbeds}
+                    onChange={() => setEnableEmbeds(!enableEmbeds)}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              <div className="setting-item">
+                <label htmlFor="metadata-toggle">Enable custom metadata</label>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    id="metadata-toggle"
+                    checked={enableMetadata}
+                    onChange={() => setEnableMetadata(!enableMetadata)}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+              {enableMetadata && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="metadataTitle">Title</label>
+                    <input
+                      type="text"
+                      id="metadataTitle"
+                      value={metadataTitle}
+                      onChange={(e) => setMetadataTitle(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="metadataDescription">Description</label>
+                    <input
+                      type="text"
+                      id="metadataDescription"
+                      value={metadataDescription}
+                      onChange={(e) => setMetadataDescription(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="metadataImage">Favicon/Image URL</label>
+                    <input
+                      type="url"
+                      id="metadataImage"
+                      value={metadataImage}
+                      onChange={(e) => setMetadataImage(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                  <div className="setting-item">
+                    <label htmlFor="cloaking-toggle">Enable link cloaking</label>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        id="cloaking-toggle"
+                        checked={enableCloaking}
+                        onChange={() => setEnableCloaking(!enableCloaking)}
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                </>
+              )}
+            </>
           )}
         </div>
 

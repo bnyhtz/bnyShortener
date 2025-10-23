@@ -28,7 +28,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    const { url, customPath, embeds } = await request.json();
+    const { url, customPath, embeds, metadata, cloaking } = await request.json();
 
     // 1. Validate URL
     if (!url || !/^(https?:\/\/)/.test(url)) {
@@ -55,6 +55,8 @@ export async function onRequestPost(context) {
       url: url,
       createdAt: Date.now(),
       embeds: embeds === true, // Ensure it's a boolean
+      metadata: metadata || null,
+      cloaking: cloaking === true,
     };
     await env.LINKS.put(path, JSON.stringify(linkData));
 
