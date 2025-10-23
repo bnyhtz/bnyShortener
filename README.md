@@ -72,6 +72,12 @@ Click **Save and Deploy**.
 6.  Go back to **Deployments** and click on **"View Details"** on the Production Deployment.
 7.  Click **"Manage Deployment"** and click **"Retry Deployment**" (THIS IS IMPORTANT FOR THE PASSWORD TO TAKE EFFECT!)
 
+### 8. (Optional) Restrict login to a single username
+
+If you'd like to restrict admin logins to a single username in addition to the password, set an environment secret named `ADMIN_USERNAME`. The server will require that the `username` field submitted on the login form matches this value. Example: set `ADMIN_USERNAME` to `akari` to require that username.
+
+Note: this repository does not create users or store usernames on the server; `ADMIN_USERNAME` is a single allowed username you configure as an environment secret.
+
 ## Usage
 
 Once deployed, you can start creating short links immediately by visiting your domain.

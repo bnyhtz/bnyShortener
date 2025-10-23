@@ -14,14 +14,24 @@ export async function onRequestPost(context) {
   }
 
   try {
-  const { password, username, remember } = await request.json();
-  const verified = !env.PASSWORD || password === env.PASSWORD;
+    const { password, username, remember } = await request.json();
+    const verified = !env.PASSWORD || password === env.PASSWORD;
 
     if (!verified) {
       return new Response(JSON.stringify({ verified: false, error: 'Incorrect password.' }), {
         status: 401,
         headers: headers,
       });
+    }
+
+    // If an ADMIN_USERNAME is configured, require the provided username to match it.
+    if (env.ADMIN_USERNAME) {
+      if (!username || String(username) !== String(env.ADMIN_USERNAME)) {
+        return new Response(JSON.stringify({ verified: false, error: 'Incorrect username.' }), {
+          status: 401,
+          headers: headers,
+        });
+      }
     }
 
     // If a session secret is configured, issue an HTTP-only cookie instead of returning the raw password
