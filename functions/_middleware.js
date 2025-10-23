@@ -42,6 +42,7 @@ export async function onRequest(context) {
             <head>
               <title>${linkData.metadata?.title || 'Link'}</title>
               <meta name="description" content="${linkData.metadata?.description || ''}">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
               ${linkData.metadata?.image ? `<link rel="icon" href="${linkData.metadata.image}">` : ''}
               <style>
                 body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
