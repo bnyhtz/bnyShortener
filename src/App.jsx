@@ -80,9 +80,8 @@ function App() {
 
           {result.editable && !isEditing && (
             <div className="edit-prompt">
-              <span>Made a mistake?</span>
               <button onClick={() => setIsEditing(true)} className="edit-button">
-                Edit
+                Made a mistake? Edit
               </button>
             </div>
           )}

@@ -98,21 +98,19 @@ button.secondary:hover {
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  color: #64748b;
+  text-align: center;
 }
 
 .edit-button {
   background: none;
   border: none;
-  color: #4f46e5;
-  font-weight: 600;
+  color: #64748b;
+  font-weight: 500;
   cursor: pointer;
   padding: 0.25rem;
   font-size: 0.9rem;
+  display: inline;
+  width: auto;
 }
 
 .edit-button:hover {

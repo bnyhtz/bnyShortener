@@ -50,8 +50,8 @@ export async function onRequestPost(context) {
       });
     }
 
-    // 4. Save the new link with an editable flag
-    const linkData = { url: url, editable: true };
+    // 4. Save the new link with a creation timestamp
+    const linkData = { url: url, createdAt: Date.now() };
     await env.LINKS.put(path, JSON.stringify(linkData));
 
     // 5. Return the successful response
@@ -113,18 +113,18 @@ export async function onRequestPut(context) {
 
     const linkData = JSON.parse(existingData);
 
-    // 3. Check if the link is still editable
-    if (!linkData.editable) {
+    // 3. Check if the link is still editable (within a 5-minute window)
+    const fiveMinutes = 5 * 60 * 1000;
+    if (!linkData.createdAt || (Date.now() - linkData.createdAt > fiveMinutes)) {
       return new Response(JSON.stringify({ error: 'This link is no longer editable.' }), {
         status: 403, // Forbidden
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    // 4. Update the link and make it permanent
-    linkData.url = url;
-    linkData.editable = false;
-    await env.LINKS.put(path, JSON.stringify(linkData));
+    // 4. Update the link and make it permanent by removing the timestamp
+    const permanentLinkData = { url: url }; // New object without createdAt
+    await env.LINKS.put(path, JSON.stringify(permanentLinkData));
 
     // 5. Return the successful response
     return new Response(JSON.stringify({
