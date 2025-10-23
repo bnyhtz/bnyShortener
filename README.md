@@ -37,7 +37,7 @@ Start by forking this repository to your own GitHub account.
 
 Use the following build settings for your project:
 
-- **Framework preset:** `Vite`
+- **Framework preset:** `Vite` (If `Vite` is not available, select `None`).
 - **Build command:** `npm run build`
 - **Build output directory:** `dist`
 
@@ -45,16 +45,17 @@ Click **Save and Deploy**.
 
 ### 4. Create a KV Namespace
 
-1.  In the Cloudflare dashboard, go to **Storage & databases** > **Workers KV**.
-2.  Click **Create Instance** and give it a name (e.g., `link-shortener-data`).
+1.  In the Cloudflare dashboard, go to **Workers & Pages** > **KV**.
+2.  Click **Create a namespace** and give it a name (e.g., `link-shortener-data`).
 
 ### 5. Bind the KV Namespace to Your Project
 
 1.  Navigate to your newly created Pages project.
-2.  Go to **Settings** > **Bindings** > **Add** > **KV namespace**.
-3.  Set the **Variable name** to `LINKS`.
-4.  Select the KV namespace you created in the previous step.
-5.  Click **Save**.
+2.  Go to **Settings** > **Functions** > **KV namespace bindings**.
+3.  Click **Add binding**.
+4.  Set the **Variable name** to `LINKS`.
+5.  Select the KV namespace you created in the previous step.
+6.  Click **Save**. This will trigger a new deployment.
 
 ### 6. Add a Custom Domain
 
@@ -62,11 +63,14 @@ Click **Save and Deploy**.
 2.  Follow the instructions to set up a custom domain. This will typically involve adding a `CNAME` record in your DNS settings.
 
 ### 7. (Optional) Set a Password
+
 1.  In your Pages project, go to **Settings** > **Variables and Secrets**.
-2.  Click **Add**.
-3.  Set the Type to **Secret**.
-4.  Set the Variable name to `PASSWORD`.
-5.  Set the Value to your preferred password.
+2.  Under **Production**, click the **Add** button.
+3.  A modal will appear. Enter `PASSWORD` as the **Variable name**.
+4.  Enter your desired password as the **Value**.
+5.  For the **Type**, select **Secret**. This is the most important step as it encrypts your password.
+6.  Click **Save**.
+7.  Redeploy your application for the changes to take effect.
 
 ## Usage
 
