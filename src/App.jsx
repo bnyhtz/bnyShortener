@@ -4,6 +4,7 @@ import './App.css';
 function App() {
   const [url, setUrl] = useState('');
   const [customPath, setCustomPath] = useState('');
+  const [isPathValid, setIsPathValid] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
@@ -17,6 +18,12 @@ function App() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (customPath && !/^[a-zA-Z0-9/-]*$/.test(customPath)) {
+      setIsPathValid(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setResult(null);
@@ -57,6 +64,7 @@ function App() {
   const handleCancel = () => {
     setUrl('');
     setCustomPath('');
+    setIsPathValid(true);
     setError(null);
     setResult(null);
     setEnableMetadata(false);
@@ -98,11 +106,24 @@ function App() {
                 type="text"
                 id="customPath"
                 value={customPath}
-                onChange={(e) => setCustomPath(e.target.value)}
+                onChange={(e) => {
+                  const newPath = e.target.value;
+                  if (!/^[a-zA-Z0-9/-]*$/.test(newPath)) {
+                    setIsPathValid(false);
+                  } else {
+                    setIsPathValid(true);
+                  }
+                  setCustomPath(newPath.replace(/[^a-zA-Z0-9/-]/g, ''));
+                }}
                 placeholder="my-custom-link"
                 disabled={loading}
               />
             </div>
+            {!isPathValid && (
+              <p className="validation-error">
+                Only letters, numbers, slashes, and dashes are allowed.
+              </p>
+            )}
           </div>
         </div>
 
@@ -170,7 +191,12 @@ function App() {
                     />
                   </div>
                   <div className="setting-item">
-                    <label htmlFor="cloaking-toggle">Enable link cloaking</label>
+                    <div className="setting-label-group">
+                      <label htmlFor="cloaking-toggle">Enable link cloaking</label>
+                      <p className="cloaking-note">
+                        Note: Link cloaking may not work for websites that have strict security policies (like Google or Facebook).
+                      </p>
+                    </div>
                     <label className="switch">
                       <input
                         type="checkbox"

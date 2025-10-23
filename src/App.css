@@ -2,6 +2,7 @@
   width: 100%;
   max-width: 800px;
   margin: 0 1rem;
+  padding-bottom: 4rem;
 }
 
 .header {
@@ -61,6 +62,7 @@
   display: inline-block;
   width: 50px;
   height: 28px;
+  flex-shrink: 0;
 }
 
 .switch input {
@@ -227,4 +229,30 @@ button.secondary:hover {
 
 .result a:hover {
   text-decoration: underline;
+}
+
+.setting-label-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 1rem;
+}
+
+.setting-label-group label {
+  margin-bottom: 0.25rem;
+}
+
+.cloaking-note {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #566280;
+  margin: 0;
+  text-align: left;
+}
+
+.validation-error {
+  font-size: 0.8rem;
+  color: #d93025;
+  margin-top: 0.5rem;
+  text-align: left;
 }

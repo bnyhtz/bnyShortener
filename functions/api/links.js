@@ -28,17 +28,26 @@ export async function onRequestPost(context) {
       });
     }
 
-    const { url, customPath, embeds, metadata, cloaking } = await request.json();
+    let { url, customPath, embeds, metadata, cloaking } = await request.json();
 
-    // 1. Validate URL
-    if (!url || !/^(https?:\/\/)/.test(url)) {
-      return new Response(JSON.stringify({ error: 'A valid URL starting with http:// or https:// is required.' }), {
+    // 1. Validate and normalize URL
+    if (!url) {
+      return new Response(JSON.stringify({ error: 'A valid URL is required.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    if (!/^(https?:\/\/)/.test(url)) {
+      url = `https://${url}`;
+    }
 
-    // 2. Determine the path
+    // 2. Validate and determine the path
+    if (customPath && !/^[a-zA-Z0-9/-]+$/.test(customPath)) {
+      return new Response(JSON.stringify({ error: 'Custom path can only contain letters, numbers, slashes, and dashes.' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
     let path = customPath || generateRandomPath();
 
     // 3. Check if the path already exists
@@ -98,14 +107,17 @@ export async function onRequestPut(context) {
       });
     }
 
-    const { url, path } = await request.json();
+    let { url, path } = await request.json();
 
-    // 1. Validate input
-    if (!path || !url || !/^(https?:\/\/)/.test(url)) {
+    // 1. Validate and normalize input
+    if (!path || !url) {
       return new Response(JSON.stringify({ error: 'A valid path and URL are required.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
+    }
+    if (!/^(https?:\/\/)/.test(url)) {
+      url = `https://${url}`;
     }
 
     // 2. Check if the link exists
