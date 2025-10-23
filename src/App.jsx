@@ -41,11 +41,30 @@ function App() {
     checkAuthStatus();
   }, []);
 
-  const handlePasswordSubmit = (event) => {
+  const handlePasswordSubmit = async (event) => {
     event.preventDefault();
-    // We don't actually validate the password here.
-    // The backend will do that on the first real API call.
-    setIsAuthenticated(true);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.verified) {
+        throw new Error(data.error || 'Incorrect password.');
+      }
+
+      setIsAuthenticated(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -130,9 +149,13 @@ function App() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
-            <button type="submit" className="primary">Continue</button>
+            <button type="submit" className="primary" disabled={loading}>
+              {loading ? 'Verifying...' : 'Continue'}
+            </button>
+            {error && <p className="error" style={{ marginTop: '1rem' }}>{error}</p>}
           </form>
         </div>
       </div>
