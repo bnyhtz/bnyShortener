@@ -55,12 +55,15 @@ export async function onRequestPost(context) {
     await env.LINKS.put(path, JSON.stringify(linkData));
 
     // 5. Return the successful response
-    const shortUrl = new URL(path, request.url).toString().replace('/api/links', '');
+    const baseUrl = new URL(request.url);
+    baseUrl.pathname = path; // Set the pathname to just the short path
+    const shortUrl = baseUrl.toString();
     
     return new Response(JSON.stringify({
       originalUrl: url,
       path: path,
       shortUrl: shortUrl,
+      editable: true, // Let the frontend know it can be edited
     }), {
       status: 201, // Created
       headers: { 'Content-Type': 'application/json' },
