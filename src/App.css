@@ -93,3 +93,43 @@ button.secondary {
 button.secondary:hover {
   background-color: #cbd5e1;
 }
+
+.edit-prompt {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.edit-button {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.edit-button:hover {
+  text-decoration: underline;
+}
+
+.inline-edit-form {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.inline-edit-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.inline-edit-form .form-actions {
+  display: flex;
+  gap: 0.5rem;
+}

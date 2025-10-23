@@ -7,12 +7,14 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
     setResult(null);
+    setIsEditing(false);
 
     try {
       const response = await fetch('/api/links', {
@@ -71,15 +73,30 @@ function App() {
 
       {result && !error && (
         <div className="result">
-          {result.editable ? (
-            <EditForm result={result} setResult={setResult} setError={setError} />
-          ) : (
-            <div>
-              <p>Your shortened link is ready!</p>
-              <a href={result.shortUrl} target="_blank" rel="noopener noreferrer">
-                {result.shortUrl}
-              </a>
+          <p>Your shortened link is ready!</p>
+          <a href={result.shortUrl} target="_blank" rel="noopener noreferrer">
+            {result.shortUrl}
+          </a>
+
+          {result.editable && !isEditing && (
+            <div className="edit-prompt">
+              <span>Made a mistake?</span>
+              <button onClick={() => setIsEditing(true)} className="edit-button">
+                Edit
+              </button>
             </div>
+          )}
+
+          {isEditing && (
+            <InlineEditForm
+              result={result}
+              onUpdateSuccess={(newUrl) => {
+                setResult({ ...result, originalUrl: newUrl, editable: false });
+                setIsEditing(false);
+              }}
+              setError={setError}
+              onCancel={() => setIsEditing(false)}
+            />
           )}
         </div>
       )}
@@ -87,7 +104,7 @@ function App() {
   );
 }
 
-function EditForm({ result, setResult, setError }) {
+function InlineEditForm({ result, onUpdateSuccess, setError, onCancel }) {
   const [newUrl, setNewUrl] = useState(result.originalUrl);
   const [loading, setLoading] = useState(false);
 
@@ -104,12 +121,10 @@ function EditForm({ result, setResult, setError }) {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || 'Failed to update the link.');
       }
-
-      setResult({ ...result, originalUrl: newUrl, editable: false });
+      onUpdateSuccess(newUrl);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -117,34 +132,28 @@ function EditForm({ result, setResult, setError }) {
     }
   };
 
-  const handleCancel = () => {
-    // Make the link permanent without changes
-    setResult({ ...result, editable: false });
-  };
-
   return (
-    <div>
-      <p>One last chance to edit your link before it becomes permanent.</p>
-      <form onSubmit={handleUpdate}>
-        <div className="form-group">
-          <label htmlFor="newUrl">Original URL</label>
-          <input
-            type="url"
-            id="newUrl"
-            value={newUrl}
-            onChange={(e) => setNewUrl(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
+    <form onSubmit={handleUpdate} className="inline-edit-form">
+      <div className="form-group">
+        <label htmlFor="newUrl">Edit Original URL</label>
+        <input
+          type="url"
+          id="newUrl"
+          value={newUrl}
+          onChange={(e) => setNewUrl(e.target.value)}
+          required
+          disabled={loading}
+        />
+      </div>
+      <div className="form-actions">
         <button type="submit" disabled={loading}>
-          {loading ? 'Saving...' : 'Save and Make Permanent'}
+          {loading ? 'Saving...' : 'Save'}
         </button>
-        <button type="button" onClick={handleCancel} disabled={loading} className="secondary">
-          Looks Good, Keep It
+        <button type="button" onClick={onCancel} disabled={loading} className="secondary">
+          Cancel
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }
 
