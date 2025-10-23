@@ -44,17 +44,16 @@ Click **Save and Deploy**.
 
 ### 4. Create a KV Namespace
 
-1.  In the Cloudflare dashboard, go to **Workers & Pages** > **KV**.
-2.  Click **Create a namespace** and give it a name (e.g., `LINKS`).
+1.  In the Cloudflare dashboard, go to **Storage & databases** > **Workers KV**.
+2.  Click **Create Instance** and give it a name (e.g., `link-shortener-data`).
 
 ### 5. Bind the KV Namespace to Your Project
 
 1.  Navigate to your newly created Pages project.
-2.  Go to **Settings** > **Functions** > **KV namespace bindings**.
-3.  Click **Add binding**.
-4.  Set the **Variable name** to `LINKS`.
-5.  Select the KV namespace you created in the previous step.
-6.  Click **Save**.
+2.  Go to **Settings** > **Bindings** > **Add** > **KV namespace**.
+3.  Set the **Variable name** to `LINKS`.
+4.  Select the KV namespace you created in the previous step.
+5.  Click **Save**.
 
 ### 6. Add a Custom Domain
 
