@@ -4,10 +4,13 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   // This endpoint should only be used if a password is set
+  const headers = {
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  };
+
   if (!env.PASSWORD) {
-    return new Response(JSON.stringify({ verified: true }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ verified: true }), { headers });
   }
 
   try {
@@ -15,13 +18,11 @@ export async function onRequestPost(context) {
     const verified = password === env.PASSWORD;
 
     if (verified) {
-      return new Response(JSON.stringify({ verified: true }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ verified: true }), { headers });
     } else {
       return new Response(JSON.stringify({ verified: false, error: 'Incorrect password.' }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
       });
     }
   } catch (error) {

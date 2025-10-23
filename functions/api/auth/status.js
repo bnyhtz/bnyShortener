@@ -7,6 +7,9 @@ export async function onRequestGet(context) {
   const passwordProtected = env.PASSWORD && env.PASSWORD.length > 0;
 
   return new Response(JSON.stringify({ passwordProtected }), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    },
   });
 }
