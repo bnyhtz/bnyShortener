@@ -34,18 +34,25 @@ export async function onRequest(context) {
         return await next();
       }
 
-      // 4. Check if the visitor is a bot and if embeds are disabled
+      // 4. Check if the visitor is a bot
       const userAgent = request.headers.get('User-Agent') || '';
       const isBot = /bot|facebook|embed|got|firefox\/92|firefox\/38|curl|wget|go-http-client|yahoo|bing|google|spider|slack|whatsapp|twitter|discord/i.test(userAgent);
 
-      if (isBot && !linkData.embeds) {
-        // Serve a blank HTML page to prevent an embed from being generated
-        return new Response('<!DOCTYPE html><title></title>', {
-          headers: { 'Content-Type': 'text/html' },
-        });
+      // 5. If it's a bot, check the embed setting
+      if (isBot) {
+        // Explicitly check for `embeds: false`. If the property doesn't exist (old links), default to true.
+        const embedsDisabled = linkData.embeds === false;
+        console.log(`Bot detected for path: /${path}. User-Agent: ${userAgent}. Embeds disabled: ${embedsDisabled}`);
+
+        if (embedsDisabled) {
+          // Serve a blank HTML page to prevent an embed from being generated
+          return new Response('<!DOCTYPE html><title></title>', {
+            headers: { 'Content-Type': 'text/html' },
+          });
+        }
       }
 
-      // 5. For all other cases, perform the redirect
+      // 6. For all regular users and bots with embeds enabled, perform the redirect
       return Response.redirect(linkData.url, 302);
     }
   } catch (error) {
