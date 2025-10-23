@@ -1,4 +1,4 @@
-# Cloudflare Link Shortener
+# Serverless Link Shortener for Cloudflare Pages
 
 A powerful, self-hosted link shortener built with React, Vite, and Cloudflare Pages. This application allows you to create short, custom links and provides advanced features like metadata customization and link cloaking, all running on the Cloudflare serverless platform.
 
