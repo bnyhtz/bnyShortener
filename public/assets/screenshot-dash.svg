@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="500" viewBox="0 0 1000 500">
+  <rect width="1000" height="500" fill="#f8fafc"/>
+  <g fill="#0B1A3D" font-family="Arial, Helvetica, sans-serif">
+    <text x="40" y="60" font-size="28" font-weight="700">Dashboard — screenshot</text>
+    <rect x="40" y="90" width="920" height="44" rx="6" fill="#ffffff" stroke="#E9EDF1"/>
+    <text x="60" y="120" font-size="14">Search / filter controls</text>
+
+    <rect x="40" y="150" width="920" height="260" rx="6" fill="#ffffff" stroke="#E9EDF1"/>
+    <text x="60" y="180" font-size="14">Links table</text>
+
+    <rect x="40" y="430" width="120" height="36" rx="6" fill="#0056FF"/>
+    <text x="60" y="455" font-size="14" fill="#ffffff">Refresh</text>
+  </g>
+</svg>

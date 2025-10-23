@@ -6,8 +6,10 @@ import NotFound from './NotFound.jsx';
 
 const path = window.location.pathname;
 
+import Manage from './Manage.jsx';
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {path === '/' ? <App /> : <NotFound />}
+    {path === '/' ? <App /> : (path === '/dash' ? <Manage /> : <NotFound />)}
   </StrictMode>,
 );

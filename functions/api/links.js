@@ -70,22 +70,9 @@ export async function onRequestPost(context) {
       });
     }
 
-    // 4. Save the new link with a creation timestamp and embed setting
-    const linkData = {
-      url: url,
-      createdAt: Date.now(),
-      embeds: embeds === true, // Ensure it's a boolean
-      metadata: metadata || null,
-      cloaking: cloaking === true,
-    };
-    await env.LINKS.put(path, JSON.stringify(linkData));
-
-    // 5. Determine the base host for the short URL. If a domain was provided,
-    // validate it against the env.DOMAINS list (if present). Otherwise fall back
-    // to the request host.
-    let baseHost;
+    // 4. Validate domain (if provided) and determine stored domain/base host
+    let storedDomain = null;
     if (domain) {
-      // If DOMAINS is set in the environment, only allow domains from that list
       if (env && env.DOMAINS) {
         const allowed = env.DOMAINS.split(',').map(s => s.trim()).filter(Boolean);
         if (!allowed.includes(domain)) {
@@ -95,20 +82,30 @@ export async function onRequestPost(context) {
           });
         }
       }
-      baseHost = domain;
-    } else {
-      // Use request host
-      const urlObj = new URL(request.url);
-      baseHost = urlObj.host;
+      storedDomain = domain;
     }
 
+    const linkData = {
+      url: url,
+      createdAt: Date.now(),
+      embeds: embeds === true, // Ensure it's a boolean
+      metadata: metadata || null,
+      cloaking: cloaking === true,
+      domain: storedDomain,
+    };
+    await env.LINKS.put(path, JSON.stringify(linkData));
+
+    // 5. Build shortUrl using storedDomain or request host
+    const urlObj = new URL(request.url);
+    const baseHost = storedDomain || urlObj.host;
     const shortUrl = `https://${baseHost}/${path}`;
     
     return new Response(JSON.stringify({
       originalUrl: url,
       path: path,
-      shortUrl: shortUrl,
+  shortUrl: shortUrl,
       editable: true, // Let the frontend know it can be edited
+  domain: storedDomain,
     }), {
       status: 201, // Created
       headers: { 'Content-Type': 'application/json' },
@@ -130,15 +127,17 @@ export async function onRequestPut(context) {
   try {
     const { request, env } = context;
 
-    // Check for password protection
+    // Determine if an admin password was provided (when PASSWORD is set)
+    let isAdmin = false;
     if (env.PASSWORD) {
       const providedPassword = request.headers.get('X-Link-Shortener-Password');
-      if (providedPassword !== env.PASSWORD) {
+      if (!providedPassword || providedPassword !== env.PASSWORD) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
         });
       }
+      isAdmin = true;
     }
 
     if (!env.LINKS) {
@@ -172,13 +171,15 @@ export async function onRequestPut(context) {
 
     const linkData = JSON.parse(existingData);
 
-    // 3. Check if the link is still editable (within a 5-minute window)
-    const fiveMinutes = 5 * 60 * 1000;
-    if (!linkData.createdAt || (Date.now() - linkData.createdAt > fiveMinutes)) {
-      return new Response(JSON.stringify({ error: 'This link is no longer editable.' }), {
-        status: 403, // Forbidden
-        headers: { 'Content-Type': 'application/json' },
-      });
+    // 3. Check if the link is still editable (within a 5-minute window), unless admin
+    if (!isAdmin) {
+      const fiveMinutes = 5 * 60 * 1000;
+      if (!linkData.createdAt || (Date.now() - linkData.createdAt > fiveMinutes)) {
+        return new Response(JSON.stringify({ error: 'This link is no longer editable.' }), {
+          status: 403, // Forbidden
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     // 4. Update the link and make it permanent by removing the timestamp
@@ -197,6 +198,56 @@ export async function onRequestPut(context) {
 
   } catch (error) {
     console.error(error);
+    return new Response(JSON.stringify({ error: 'An unexpected error occurred.' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+
+/**
+ * Handles DELETE requests to remove a shortened link.
+ * Accepts JSON body: { path: 'short-path' }
+ */
+export async function onRequestDelete(context) {
+  try {
+    const { request, env } = context;
+
+    // Require password if configured
+    if (env.PASSWORD) {
+      const providedPassword = request.headers.get('X-Link-Shortener-Password');
+      if (!providedPassword || providedPassword !== env.PASSWORD) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    if (!env.LINKS) {
+      return new Response(JSON.stringify({ error: 'KV Namespace "LINKS" is not bound.' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { path } = await request.json();
+    if (!path) {
+      return new Response(JSON.stringify({ error: 'A valid path is required.' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    await env.LINKS.delete(path);
+
+    return new Response(JSON.stringify({ message: 'Deleted' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+  } catch (err) {
+    console.error(err);
     return new Response(JSON.stringify({ error: 'An unexpected error occurred.' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

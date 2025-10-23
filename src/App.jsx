@@ -29,6 +29,7 @@ function App() {
     setToast(msg);
     setTimeout(() => setToast(null), ms);
   };
+  // ... no inline manage panel; dedicated Manage page available at /dash
 
   useEffect(() => {
     const checkAuthStatus = async () => {
@@ -196,6 +197,9 @@ function App() {
     <div className="container">
       <div className="header">
         <h1>Create a new link</h1>
+        <div>
+          <a href="/dash" style={{ textDecoration: 'none' }}><button className="secondary">Manage links</button></a>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -373,8 +377,10 @@ function App() {
         </div>
       )}
 
-        {toast && <div className="toast">{toast}</div>}
-      </div>
+      {/* Manage panel moved to /dash (Manage.jsx) */}
+
+      {toast && <div className="toast">{toast}</div>}
+    </div>
   );
 }
 

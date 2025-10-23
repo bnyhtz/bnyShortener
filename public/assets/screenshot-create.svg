@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <rect width="800" height="450" fill="#f3f6ff"/>
+  <g fill="#0B1A3D" font-family="Arial, Helvetica, sans-serif">
+    <text x="40" y="80" font-size="28" font-weight="700">Create a new link — screenshot</text>
+    <rect x="40" y="110" width="720" height="60" rx="8" fill="#ffffff" stroke="#E9EDF1"/>
+    <text x="60" y="150" font-size="16">Destination URL input</text>
+
+    <rect x="40" y="190" width="720" height="60" rx="8" fill="#ffffff" stroke="#E9EDF1"/>
+    <text x="60" y="230" font-size="16">Short link / domain selector</text>
+
+    <rect x="40" y="270" width="160" height="44" rx="8" fill="#0056FF"/>
+    <text x="64" y="300" font-size="14" fill="#ffffff">Create your link</text>
+  </g>
+</svg>

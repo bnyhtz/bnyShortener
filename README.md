@@ -82,3 +82,35 @@ Once deployed, you can start creating short links immediately by visiting your d
     - **Enable link previews:** Control whether social media platforms can generate a preview of the link.
     - **Enable custom metadata:** Override the default title, description, and image for link previews.
     - **Enable link cloaking:** Mask the destination URL. Note that this may not work for websites with strict security policies (like Google or Facebook).
+
+## Manage dashboard (/dash)
+
+The project now includes a management dashboard available at the `/dash` path. Visit `https://your-deployed-site/dash` to open it.
+
+- View all stored short links (server-side listing).
+- Filter links by domain using the domain dropdown.
+- Search links by short path or original URL.
+- Edit the destination URL for a short link (admin action — requires password if `PASSWORD` is set).
+- Delete a short link (admin action — requires password if `PASSWORD` is set).
+
+Edits performed within the dashboard use the same backend APIs as link creation (PUT to `/api/links`), and deletion uses DELETE `/api/links`. If you configured the optional `PASSWORD` environment secret, the dashboard will prompt you to enter it before performing admin actions.
+
+Note: the server-side listing currently returns up to 1000 keys from KV. If you have many links you may want to add pagination/cursor support.
+
+## API: list, edit, delete
+
+- `GET /api/list-links` — Returns a JSON array of stored links. Supports optional query parameter `?domain=example.com` to filter results by domain.
+- `PUT /api/links` — Update an existing link's destination. Admin password required if `PASSWORD` is set. Admin edits bypass the 5-minute editable window.
+- `DELETE /api/links` — Delete a stored short link. Admin password required if `PASSWORD` is set.
+
+When performing admin operations (edit/delete) via direct API calls, include the header `X-Link-Shortener-Password: <your-password>` if you configured `PASSWORD` as a secret in your Pages project.
+
+## Screenshots
+
+Create link view:
+
+![Create view](/assets/screenshot-create.svg)
+
+Dashboard view (/dash):
+
+![Dashboard view](/assets/screenshot-dash.svg)
