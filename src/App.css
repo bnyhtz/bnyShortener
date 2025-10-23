@@ -18,6 +18,8 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   padding: 2rem;
   margin-bottom: 1.5rem;
+  /* entrance animation */
+  animation: fadeUp 320ms cubic-bezier(.2,.9,.2,1) both;
 }
 
 .card-header {
@@ -237,6 +239,7 @@ input:checked + .slider:before {
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(2,6,23,0.5);
   z-index: 9999;
+  animation: slideIn 300ms cubic-bezier(.2,.9,.2,1) both;
 }
 
 .short-link-group span {
@@ -293,6 +296,7 @@ button.secondary:hover {
   background-color: #F8F9FC;
   border: 1px solid #E9EDF1;
   text-align: left;
+  animation: pop 260ms cubic-bezier(.2,.9,.2,1) both;
 }
 
 .result p {
@@ -303,7 +307,7 @@ button.secondary:hover {
 
 .result a {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #0056FF;
   word-break: break-all;
   text-decoration: none;
@@ -349,6 +353,7 @@ button.secondary:hover {
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   box-sizing: border-box;
+  animation: fadeUp 320ms cubic-bezier(.2,.9,.2,1) both;
 }
 
 .login-card h1 {
@@ -366,4 +371,20 @@ button.secondary:hover {
     padding: 2rem;
     width: calc(100% - 2rem);
   }
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pop {
+  0% { transform: scale(.985); opacity: 0; }
+  60% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }

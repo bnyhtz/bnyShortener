@@ -1,7 +1,8 @@
 :root {
-  font-family: 'DM Sans', sans-serif;
+  /* Use Arial as the global font and force bold weight to match request */
+  font-family: Arial, Helvetica, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 700;
   color: #0B1A3D;
   background-color: #f0f2f5;
   font-synthesis: none;
