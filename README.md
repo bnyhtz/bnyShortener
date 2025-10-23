@@ -11,6 +11,7 @@ A powerful, self-hosted link shortener built with React, Vite, and Cloudflare Pa
 - **Mobile-Friendly:** Responsive design that works on all devices.
 - **404 Page:** A user-friendly "Not Found" page for any links that don't exist.
 - **Serverless Deployment:** Runs entirely on the Cloudflare network, with no servers to manage.
+- **Optional Password:** You can set a password so only you can use your link shortener.
 
 ## Tech Stack
 
@@ -59,6 +60,13 @@ Click **Save and Deploy**.
 
 1.  In your Pages project, go to the **Custom domains** tab.
 2.  Follow the instructions to set up a custom domain. This will typically involve adding a `CNAME` record in your DNS settings.
+
+### 7. (Optional) Set a Password
+1.  In your Pages project, go to **Settings** > **Variables and Secrets**.
+2.  Click **Add**.
+3.  Set the Type to **Secret**.
+4.  Set the Variable name to `PASSWORD`.
+5.  Set the Value to your preferred password.
 
 ## Usage
 
