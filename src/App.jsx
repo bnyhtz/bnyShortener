@@ -25,7 +25,7 @@ function App() {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await fetch('/api/auth/status');
+        const response = await fetch('/api/auth/status', { cache: 'no-store' });
         const data = await response.json();
         if (data.passwordProtected) {
           setAuthStatus('required');
