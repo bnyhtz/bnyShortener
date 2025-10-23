@@ -35,3 +35,17 @@
 .not-found-container a:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 600px) {
+  .not-found-container {
+    padding: 1rem;
+  }
+
+  .not-found-container h1 {
+    font-size: 4rem;
+  }
+
+  .not-found-container p {
+    font-size: 1rem;
+  }
+}

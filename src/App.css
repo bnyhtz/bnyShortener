@@ -276,3 +276,10 @@ button.secondary:hover {
   margin-bottom: 2rem;
   color: #566280;
 }
+
+@media (max-width: 600px) {
+  .login-card {
+    margin: 1rem;
+    padding: 2rem;
+  }
+}
