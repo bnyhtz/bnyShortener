@@ -28,11 +28,25 @@ export async function onRequest(context) {
     const storedValue = await env.LINKS.get(path);
 
     if (storedValue) {
-      // 4. If found, parse the data and redirect to the URL
       const linkData = JSON.parse(storedValue);
-      if (linkData && linkData.url) {
-        return Response.redirect(linkData.url, 302); // 302 Found redirect
+      if (!linkData || !linkData.url) {
+        // Invalid data in KV, proceed to 404
+        return await next();
       }
+
+      // 4. Check if the visitor is a bot and if embeds are disabled
+      const userAgent = request.headers.get('User-Agent') || '';
+      const isBot = /bot|facebook|embed|got|firefox\/92|firefox\/38|curl|wget|go-http-client|yahoo|bing|google|spider|slack|whatsapp|twitter|discord/i.test(userAgent);
+
+      if (isBot && !linkData.embeds) {
+        // Serve a blank HTML page to prevent an embed from being generated
+        return new Response('<!DOCTYPE html><title></title>', {
+          headers: { 'Content-Type': 'text/html' },
+        });
+      }
+
+      // 5. For all other cases, perform the redirect
+      return Response.redirect(linkData.url, 302);
     }
   } catch (error) {
     console.error(`KV lookup or redirect failed: ${error}`);

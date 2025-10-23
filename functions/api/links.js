@@ -28,7 +28,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    const { url, customPath } = await request.json();
+    const { url, customPath, embeds } = await request.json();
 
     // 1. Validate URL
     if (!url || !/^(https?:\/\/)/.test(url)) {
@@ -50,8 +50,12 @@ export async function onRequestPost(context) {
       });
     }
 
-    // 4. Save the new link with a creation timestamp
-    const linkData = { url: url, createdAt: Date.now() };
+    // 4. Save the new link with a creation timestamp and embed setting
+    const linkData = {
+      url: url,
+      createdAt: Date.now(),
+      embeds: embeds === true, // Ensure it's a boolean
+    };
     await env.LINKS.put(path, JSON.stringify(linkData));
 
     // 5. Return the successful response
@@ -123,7 +127,7 @@ export async function onRequestPut(context) {
     }
 
     // 4. Update the link and make it permanent by removing the timestamp
-    const permanentLinkData = { url: url }; // New object without createdAt
+    const permanentLinkData = { url: url, embeds: linkData.embeds }; // Preserve embed setting
     await env.LINKS.put(path, JSON.stringify(permanentLinkData));
 
     // 5. Return the successful response
