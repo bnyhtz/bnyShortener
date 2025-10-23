@@ -149,7 +149,10 @@ export default function Manage() {
         await fetch('/api/auth/logout', { method: 'POST' });
       } catch (e) {}
       setSessionAuthenticated(false);
+      try { window.sessionStorage.removeItem('loggedInFromMain'); } catch (e) {}
       try { notify('Logged out', { duration: 1500 }); } catch (e) {}
+      // redirect to main page after logout
+      try { window.location.pathname = '/'; } catch (e) {}
     })();
   };
 
@@ -167,7 +170,6 @@ export default function Manage() {
           {passwordProtected && !sessionAuthenticated && (
             <div style={{ display: 'flex', gap: '0.5rem', marginLeft: '1rem', alignItems: 'center' }}>
               <input type="text" placeholder="Username" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} style={{ padding: '0.5rem' }} />
-              <button type="button" className="secondary" onClick={() => { try { window.localStorage.removeItem('rememberedUsername'); } catch (e) {} setLoginUsername(''); }} title="Clear remembered username">Clear</button>
               <input type="password" placeholder="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} style={{ padding: '0.5rem' }} />
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                 <input type="checkbox" checked={loginRemember} onChange={(e) => setLoginRemember(e.target.checked)} />

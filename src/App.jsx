@@ -108,6 +108,7 @@ function App() {
         const js = await s.json();
         if (js && js.authenticated) {
           setSessionAuthenticated(true);
+            try { window.sessionStorage.setItem('loggedInFromMain', '1'); } catch (e) {}
         } else {
           // If server didn't issue a cookie, we keep a legacy in-memory state to allow header auth
           setSessionAuthenticated(false);
@@ -126,6 +127,7 @@ function App() {
           window.localStorage.removeItem('rememberedUsername');
         }
       } catch (e) {}
+        try { window.sessionStorage.setItem('loggedInFromMain', '1'); } catch (e) {}
     } catch (err) {
       setError(err.message);
     } finally {
@@ -210,30 +212,22 @@ function App() {
     return (
       <div className="container">
         <div className="login-card">
-          <h1>Password Required</h1>
-          <p>Please enter the password to use this service.</p>
+          <h1>bnyShortener</h1>
+          <p style={{ textAlign: 'center' }}>Please enter the password to use this service.</p>
           <form onSubmit={handlePasswordSubmit}>
-            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ flex: 1 }}>
-                <label htmlFor="username">Username</label>
-                <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  disabled={loading}
-                  style={{ width: '100%' }}
-                />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                <button type="button" className="secondary" onClick={() => {
-                  try { window.localStorage.removeItem('rememberedUsername'); } catch (e) {}
-                  setUsername('');
-                }} title="Clear remembered username">Clear</button>
-              </div>
+            <div className="form-group" style={{ textAlign: 'center' }}>
+              <label htmlFor="username" style={{ display: 'block', textAlign: 'center' }}>Username</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={loading}
+                style={{ width: '100%', textAlign: 'center' }}
+              />
             </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
+            <div className="form-group" style={{ textAlign: 'center' }}>
+              <label htmlFor="password" style={{ display: 'block', textAlign: 'center' }}>Password</label>
               <input
                 type="password"
                 id="password"
@@ -241,11 +235,12 @@ function App() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                style={{ width: '100%', textAlign: 'center' }}
               />
             </div>
-            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+            <div className="form-group" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <label htmlFor="remember" style={{ margin: 0 }}>Remember me</label>
+              <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
             </div>
             <button type="submit" className="primary" disabled={loading}>
               {loading ? 'Verifying...' : 'Continue'}

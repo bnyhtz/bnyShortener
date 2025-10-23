@@ -17,7 +17,8 @@ import Manage from './Manage.jsx';
     try {
       const resp = await fetch('/api/auth/session', { cache: 'no-store' });
       const js = await resp.json();
-      if (!js || !js.authenticated) {
+      const fromMain = (() => { try { return !!window.sessionStorage.getItem('loggedInFromMain'); } catch (e) { return false; } })();
+      if (!js || !js.authenticated || !fromMain) {
         window.location.pathname = '/';
         return;
       }
