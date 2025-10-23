@@ -1,7 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
+  // App State
+  const [authStatus, setAuthStatus] = useState('loading'); // 'loading', 'required', 'not_required'
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Form State
   const [url, setUrl] = useState('');
   const [customPath, setCustomPath] = useState('');
   const [isPathValid, setIsPathValid] = useState(true);
@@ -15,6 +21,32 @@ function App() {
   const [metadataDescription, setMetadataDescription] = useState('');
   const [metadataImage, setMetadataImage] = useState('');
   const [enableCloaking, setEnableCloaking] = useState(false);
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        if (data.passwordProtected) {
+          setAuthStatus('required');
+        } else {
+          setAuthStatus('not_required');
+          setIsAuthenticated(true);
+        }
+      } catch (err) {
+        setError('Could not connect to the server.');
+        setAuthStatus('not_required'); // Fail open
+      }
+    };
+    checkAuthStatus();
+  }, []);
+
+  const handlePasswordSubmit = (event) => {
+    event.preventDefault();
+    // We don't actually validate the password here.
+    // The backend will do that on the first real API call.
+    setIsAuthenticated(true);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -35,9 +67,14 @@ function App() {
     } : null;
 
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (authStatus === 'required') {
+        headers['X-Link-Shortener-Password'] = password;
+      }
+
       const response = await fetch('/api/links', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify({
           url,
           customPath,
@@ -73,6 +110,34 @@ function App() {
     setMetadataImage('');
     setEnableCloaking(false);
   };
+
+  if (authStatus === 'loading') {
+    return <div className="container"><p>Loading...</p></div>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container">
+        <div className="login-card">
+          <h1>Password Required</h1>
+          <p>Please enter the password to use this service.</p>
+          <form onSubmit={handlePasswordSubmit}>
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" className="primary">Continue</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">

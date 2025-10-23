@@ -21,6 +21,17 @@ export async function onRequestPost(context) {
   try {
     const { request, env } = context;
 
+    // Check for password protection
+    if (env.PASSWORD) {
+      const providedPassword = request.headers.get('X-Link-Shortener-Password');
+      if (providedPassword !== env.PASSWORD) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     if (!env.LINKS) {
       return new Response(JSON.stringify({ error: 'KV Namespace "LINKS" is not bound. Please check your Cloudflare Pages project settings.' }), {
         status: 500,
@@ -99,6 +110,17 @@ export async function onRequestPost(context) {
 export async function onRequestPut(context) {
   try {
     const { request, env } = context;
+
+    // Check for password protection
+    if (env.PASSWORD) {
+      const providedPassword = request.headers.get('X-Link-Shortener-Password');
+      if (providedPassword !== env.PASSWORD) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    }
 
     if (!env.LINKS) {
       return new Response(JSON.stringify({ error: 'KV Namespace "LINKS" is not bound. Please check your Cloudflare Pages project settings.' }), {
