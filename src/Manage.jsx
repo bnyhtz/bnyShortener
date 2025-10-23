@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import { useNotify } from './notifications/NotificationProvider';
+import { confirm, prompt, alert as dlgAlert } from './dialogs/dialogs';
 
 export default function Manage() {
   const [domains, setDomains] = useState([]);
@@ -9,7 +11,10 @@ export default function Manage() {
   const [search, setSearch] = useState('');
   const [linksLoading, setLinksLoading] = useState(false);
   const [passwordProtected, setPasswordProtected] = useState(false);
-  const [sessionPassword, setSessionPassword] = useState(null);
+  const [sessionAuthenticated, setSessionAuthenticated] = useState(false);
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginRemember, setLoginRemember] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
@@ -26,11 +31,19 @@ export default function Manage() {
         setPasswordProtected(!!js.passwordProtected);
       } catch (e) {}
     })();
-    // restore session password from localStorage
+    // restore remembered username and check server-side session (cookie)
     try {
-      const saved = window.localStorage.getItem('adminPassword');
-      if (saved) setSessionPassword(saved);
+      const saved = window.localStorage.getItem('rememberedUsername');
+      if (saved) setLoginUsername(saved);
     } catch (e) {}
+
+    (async () => {
+      try {
+        const s = await fetch('/api/auth/session', { cache: 'no-store' });
+        const js = await s.json();
+        if (js && js.authenticated) setSessionAuthenticated(true);
+      } catch (e) {}
+    })();
   }, []);
 
   const fetchLinks = async (domain) => {
@@ -41,7 +54,7 @@ export default function Manage() {
       const data = await resp.json();
       setLinks(Array.isArray(data.links) ? data.links : []);
     } catch (e) {
-      alert('Failed to load links');
+      try { notify('Failed to load links', { duration: 3000 }); } catch (er) { dlgAlert('Failed to load links'); }
     } finally {
       setLinksLoading(false);
     }
@@ -55,64 +68,89 @@ export default function Manage() {
     return (l.path && l.path.toLowerCase().includes(s)) || (l.originalUrl && l.originalUrl.toLowerCase().includes(s));
   });
 
+  const notify = useNotify();
+
   const doDelete = async (path) => {
-    if (!confirm(`Delete ${path}? This cannot be undone.`)) return;
+    if (!(await confirm(`Delete ${path}? This cannot be undone.`))) return;
     let headers = { 'Content-Type': 'application/json' };
     if (passwordProtected) {
-      const pwd = sessionPassword || prompt('Enter admin password to delete:');
-      if (!pwd) return;
-      headers['X-Link-Shortener-Password'] = pwd;
+      // prefer server-side session; if not authenticated, prompt and use legacy header
+      if (!sessionAuthenticated) {
+        const pwd = await prompt('Enter admin password to delete:');
+        if (!pwd) return;
+        headers['X-Link-Shortener-Password'] = pwd;
+      }
     }
     const resp = await fetch('/api/links', { method: 'DELETE', headers, body: JSON.stringify({ path }) });
     if (resp.ok) {
       setLinks(links.filter(l => l.path !== path));
-      alert('Deleted');
+      try { notify('Deleted', { duration: 2500 }); } catch (e) {}
     } else {
       const js = await resp.json().catch(() => ({}));
-      alert(js.error || 'Delete failed');
+      try { notify(js.error || 'Delete failed', { duration: 4000 }); } catch (er) { dlgAlert(js.error || 'Delete failed'); }
     }
   };
 
   const doEdit = async (path, currentUrl) => {
-    const newUrl = prompt('Enter new destination URL', currentUrl);
+    const newUrl = await prompt('Enter new destination URL', currentUrl);
     if (!newUrl) return;
     let headers = { 'Content-Type': 'application/json' };
     if (passwordProtected) {
-      const pwd = sessionPassword || prompt('Enter admin password to edit:');
-      if (!pwd) return;
-      headers['X-Link-Shortener-Password'] = pwd;
+      if (!sessionAuthenticated) {
+        const pwd = await prompt('Enter admin password to edit:');
+        if (!pwd) return;
+        headers['X-Link-Shortener-Password'] = pwd;
+      }
     }
 
     const resp = await fetch('/api/links', { method: 'PUT', headers, body: JSON.stringify({ path, url: newUrl }) });
     if (resp.ok) {
-      alert('Updated');
+      try { notify('Updated', { duration: 2500 }); } catch (e) {}
       fetchLinks(filterDomain || null);
     } else {
       const js = await resp.json().catch(() => ({}));
-      alert(js.error || 'Update failed');
+      try { notify(js.error || 'Update failed', { duration: 4000 }); } catch (er) { dlgAlert(js.error || 'Update failed'); }
     }
   };
 
-  const handleLogin = async (password) => {
+
+  const handleLogin = async (username, password, remember) => {
     setLoginLoading(true);
     try {
-      const resp = await fetch('/api/auth/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+      const resp = await fetch('/api/auth/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password, remember }) });
       const js = await resp.json();
       if (resp.ok && js.verified) {
-        setSessionPassword(password);
-        try { window.localStorage.setItem('adminPassword', password); } catch (e) {}
-        alert('Logged in');
+        // Server should have issued an HttpOnly cookie; confirm session
+        try {
+          const s = await fetch('/api/auth/session', { cache: 'no-store' });
+          const sj = await s.json();
+          if (sj && sj.authenticated) setSessionAuthenticated(true);
+        } catch (e) {}
+        // persist username when remember checked
+        try {
+          if (remember) {
+            window.localStorage.setItem('rememberedUsername', username || '');
+          } else {
+            window.localStorage.removeItem('rememberedUsername');
+          }
+        } catch (e) {}
+        try { notify('Logged in', { duration: 2000 }); } catch (e) {}
       } else {
-        alert(js.error || 'Incorrect password');
+        try { notify(js.error || 'Incorrect password', { duration: 3000 }); } catch (er) { dlgAlert(js.error || 'Incorrect password'); }
       }
-    } catch (e) { alert('Login failed'); }
+  } catch (e) { try { notify('Login failed', { duration: 3000 }); } catch (er) { dlgAlert('Login failed'); } }
     finally { setLoginLoading(false); }
   };
 
   const handleLogout = () => {
-    setSessionPassword(null);
-    try { window.localStorage.removeItem('adminPassword'); } catch (e) {}
-    alert('Logged out');
+    // Clear server-side cookie
+    (async () => {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } catch (e) {}
+      setSessionAuthenticated(false);
+      try { notify('Logged out', { duration: 1500 }); } catch (e) {}
+    })();
   };
 
   return (
@@ -126,16 +164,21 @@ export default function Manage() {
           </select>
           <input placeholder="Search path or URL" value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginLeft: '0.5rem' }} />
           <button className="primary" onClick={() => fetchLinks(filterDomain || null)} style={{ marginLeft: '0.5rem' }} disabled={linksLoading}>{linksLoading ? 'Loading...' : 'Refresh'}</button>
-          {passwordProtected && !sessionPassword && (
+          {passwordProtected && !sessionAuthenticated && (
             <div style={{ display: 'flex', gap: '0.5rem', marginLeft: '1rem', alignItems: 'center' }}>
-              <input type="password" placeholder="Admin password" id="adminPwd" style={{ padding: '0.5rem' }} />
+              <input type="text" placeholder="Username" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} style={{ padding: '0.5rem' }} />
+              <button type="button" className="secondary" onClick={() => { try { window.localStorage.removeItem('rememberedUsername'); } catch (e) {} setLoginUsername(''); }} title="Clear remembered username">Clear</button>
+              <input type="password" placeholder="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} style={{ padding: '0.5rem' }} />
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <input type="checkbox" checked={loginRemember} onChange={(e) => setLoginRemember(e.target.checked)} />
+                <span style={{ fontSize: '0.85rem' }}>Remember</span>
+              </label>
               <button className="primary" onClick={() => {
-                const v = document.getElementById('adminPwd').value;
-                if (v) handleLogin(v);
+                handleLogin(loginUsername, loginPassword, loginRemember);
               }} disabled={loginLoading}>{loginLoading ? 'Logging in...' : 'Login'}</button>
             </div>
           )}
-          {sessionPassword && (
+          {sessionAuthenticated && (
             <div style={{ marginLeft: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <span className="small-muted">Admin</span>
               <button className="secondary" onClick={handleLogout}>Logout</button>
@@ -143,6 +186,8 @@ export default function Manage() {
           )}
         </div>
       </div>
+
+  {/* Notifications are rendered by NotificationProvider */}
 
       <div className="card">
         <div style={{ overflowX: 'auto' }}>
@@ -171,7 +216,7 @@ export default function Manage() {
                   <td style={{ padding: '0.75rem' }}>{l.domain || window.location.host}</td>
                   <td style={{ padding: '0.75rem' }}>{l.createdAt ? new Date(l.createdAt).toLocaleString() : '-'}</td>
                   <td style={{ padding: '0.75rem' }}>
-                    <button className="copy-btn" onClick={async () => { try { await navigator.clipboard.writeText(l.shortUrl); alert('Copied'); } catch { alert('Copy failed'); } }}>Copy</button>
+                    <button className="copy-btn" onClick={async () => { try { await navigator.clipboard.writeText(l.shortUrl); try { notify('Copied', { duration: 1500 }); } catch (er) { dlgAlert('Copied'); } } catch { try { notify('Copy failed', { duration: 3000 }); } catch (er) { dlgAlert('Copy failed'); } } }}>Copy</button>
                     <button className="open-btn" style={{ marginLeft: '0.5rem' }} onClick={() => window.open(l.shortUrl, '_blank')}>Open</button>
                     <button className="secondary" style={{ marginLeft: '0.5rem' }} onClick={() => doEdit(l.path, l.originalUrl)}>Edit</button>
                     <button className="secondary" style={{ marginLeft: '0.5rem' }} onClick={() => doDelete(l.path)}>Delete</button>

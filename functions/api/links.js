@@ -22,15 +22,33 @@ export async function onRequestPost(context) {
     const { request, env } = context;
 
     // Check for password protection
-    if (env.PASSWORD) {
-      const providedPassword = request.headers.get('X-Link-Shortener-Password');
-      if (providedPassword !== env.PASSWORD) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        });
+      // Check for password protection. Accept either the legacy header or a valid session cookie.
+      if (env.PASSWORD) {
+        const providedPassword = request.headers.get('X-Link-Shortener-Password');
+        let ok = false;
+        if (providedPassword && providedPassword === env.PASSWORD) ok = true;
+        // Try cookie-based session if configured
+        if (!ok && env.SESSION_SECRET) {
+          try {
+            const cookie = request.headers.get('Cookie') || '';
+            const m = cookie.split(';').map(s => s.trim()).find(s => s.startsWith('link_session='));
+            if (m) {
+              const token = m.split('=')[1];
+              const { verifyJWT } = await import('./auth/utils.js');
+              const payload = await verifyJWT(token, env.SESSION_SECRET);
+              if (payload) ok = true;
+            }
+          } catch (e) {
+            // ignore verification errors
+          }
+        }
+        if (!ok) {
+          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
       }
-    }
 
     if (!env.LINKS) {
       return new Response(JSON.stringify({ error: 'KV Namespace "LINKS" is not bound. Please check your Cloudflare Pages project settings.' }), {
@@ -127,17 +145,32 @@ export async function onRequestPut(context) {
   try {
     const { request, env } = context;
 
-    // Determine if an admin password was provided (when PASSWORD is set)
+    // Determine if an admin password/session was provided (when PASSWORD is set)
     let isAdmin = false;
     if (env.PASSWORD) {
       const providedPassword = request.headers.get('X-Link-Shortener-Password');
-      if (!providedPassword || providedPassword !== env.PASSWORD) {
+      if (providedPassword && providedPassword === env.PASSWORD) isAdmin = true;
+      // try cookie-based session
+      if (!isAdmin && env.SESSION_SECRET) {
+        try {
+          const cookie = request.headers.get('Cookie') || '';
+          const m = cookie.split(';').map(s => s.trim()).find(s => s.startsWith('link_session='));
+          if (m) {
+            const token = m.split('=')[1];
+            const { verifyJWT } = await import('./auth/utils.js');
+            const payload = await verifyJWT(token, env.SESSION_SECRET);
+            if (payload) isAdmin = true;
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+      if (!isAdmin) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
         });
       }
-      isAdmin = true;
     }
 
     if (!env.LINKS) {
@@ -213,10 +246,24 @@ export async function onRequestDelete(context) {
   try {
     const { request, env } = context;
 
-    // Require password if configured
+    // Require password if configured (accept header or cookie session)
     if (env.PASSWORD) {
       const providedPassword = request.headers.get('X-Link-Shortener-Password');
-      if (!providedPassword || providedPassword !== env.PASSWORD) {
+      let ok = false;
+      if (providedPassword && providedPassword === env.PASSWORD) ok = true;
+      if (!ok && env.SESSION_SECRET) {
+        try {
+          const cookie = request.headers.get('Cookie') || '';
+          const m = cookie.split(';').map(s => s.trim()).find(s => s.startsWith('link_session='));
+          if (m) {
+            const token = m.split('=')[1];
+            const { verifyJWT } = await import('./auth/utils.js');
+            const payload = await verifyJWT(token, env.SESSION_SECRET);
+            if (payload) ok = true;
+          }
+        } catch (e) {}
+      }
+      if (!ok) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' },

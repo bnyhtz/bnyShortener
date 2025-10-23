@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import { useNotify } from './notifications/NotificationProvider';
 
 function App() {
   // App State
   const [authStatus, setAuthStatus] = useState('loading'); // 'loading', 'required', 'not_required'
   const [password, setPassword] = useState('');
-  const [sessionPassword, setSessionPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [remember, setRemember] = useState(false);
+  const [sessionAuthenticated, setSessionAuthenticated] = useState(false);
 
   // Form State
   const [url, setUrl] = useState('');
@@ -23,11 +26,9 @@ function App() {
   const [metadataDescription, setMetadataDescription] = useState('');
   const [metadataImage, setMetadataImage] = useState('');
   const [enableCloaking, setEnableCloaking] = useState(false);
-  // Toast notification
-  const [toast, setToast] = useState(null);
-  const showToast = (msg, ms = 2500) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), ms);
+  const notify = useNotify();
+  const showToast = (message, duration = 2500, actionLabel = null, onAction = null) => {
+    try { notify(message, { duration, actionLabel, onAction }); } catch (e) { /* provider not mounted */ }
   };
   // ... no inline manage panel; dedicated Manage page available at /dash
 
@@ -47,6 +48,21 @@ function App() {
       }
     };
     checkAuthStatus();
+
+    // restore remembered username
+    try {
+      const savedUser = window.localStorage.getItem('rememberedUsername');
+      if (savedUser) setUsername(savedUser);
+    } catch (e) {}
+
+    // check existing session (cookie)
+    (async () => {
+      try {
+        const s = await fetch('/api/auth/session', { cache: 'no-store' });
+        const js = await s.json();
+        if (js && js.authenticated) setSessionAuthenticated(true);
+      } catch (e) {}
+    })();
 
     // Fetch available domains for the domain chooser
     (async () => {
@@ -74,11 +90,11 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
+        const response = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, username, remember }),
+        });
 
       const data = await response.json();
 
@@ -86,7 +102,30 @@ function App() {
         throw new Error(data.error || 'Incorrect password.');
       }
 
-      setSessionPassword(password);
+      // Verify session cookie was issued (if server supports it)
+      try {
+        const s = await fetch('/api/auth/session', { cache: 'no-store' });
+        const js = await s.json();
+        if (js && js.authenticated) {
+          setSessionAuthenticated(true);
+        } else {
+          // If server didn't issue a cookie, we keep a legacy in-memory state to allow header auth
+          setSessionAuthenticated(false);
+          // legacy behavior: some deployments expect the client to send the password header;
+          // we keep not persisting the raw password to localStorage for security.
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      // persist username when remember is checked
+      try {
+        if (remember) {
+          window.localStorage.setItem('rememberedUsername', username || '');
+        } else {
+          window.localStorage.removeItem('rememberedUsername');
+        }
+      } catch (e) {}
     } catch (err) {
       setError(err.message);
     } finally {
@@ -114,8 +153,10 @@ function App() {
 
     try {
       const headers = { 'Content-Type': 'application/json' };
-      if (authStatus === 'required') {
-        headers['X-Link-Shortener-Password'] = sessionPassword;
+      // If password protection is enabled but we don't have a server-side session cookie,
+      // fall back to sending the password header if present (legacy behavior).
+      if (authStatus === 'required' && !sessionAuthenticated && password) {
+        headers['X-Link-Shortener-Password'] = password;
       }
 
         // persist chosen domain
@@ -165,13 +206,32 @@ function App() {
     return <div className="container"><p>Loading...</p></div>;
   }
 
-  if (authStatus === 'required' && !sessionPassword) {
+  if (authStatus === 'required' && !sessionAuthenticated) {
     return (
       <div className="container">
         <div className="login-card">
           <h1>Password Required</h1>
           <p>Please enter the password to use this service.</p>
           <form onSubmit={handlePasswordSubmit}>
+            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ flex: 1 }}>
+                <label htmlFor="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={loading}
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <button type="button" className="secondary" onClick={() => {
+                  try { window.localStorage.removeItem('rememberedUsername'); } catch (e) {}
+                  setUsername('');
+                }} title="Clear remembered username">Clear</button>
+              </div>
+            </div>
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
@@ -182,6 +242,10 @@ function App() {
                 required
                 disabled={loading}
               />
+            </div>
+            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input id="remember" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+              <label htmlFor="remember" style={{ margin: 0 }}>Remember me</label>
             </div>
             <button type="submit" className="primary" disabled={loading}>
               {loading ? 'Verifying...' : 'Continue'}
@@ -379,7 +443,7 @@ function App() {
 
       {/* Manage panel moved to /dash (Manage.jsx) */}
 
-      {toast && <div className="toast">{toast}</div>}
+      {/* Notifications rendered by NotificationProvider */}
     </div>
   );
 }
