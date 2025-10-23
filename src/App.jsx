@@ -5,7 +5,7 @@ function App() {
   // App State
   const [authStatus, setAuthStatus] = useState('loading'); // 'loading', 'required', 'not_required'
   const [password, setPassword] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sessionPassword, setSessionPassword] = useState('');
 
   // Form State
   const [url, setUrl] = useState('');
@@ -31,7 +31,6 @@ function App() {
           setAuthStatus('required');
         } else {
           setAuthStatus('not_required');
-          setIsAuthenticated(true);
         }
       } catch (err) {
         setError('Could not connect to the server.');
@@ -59,7 +58,7 @@ function App() {
         throw new Error(data.error || 'Incorrect password.');
       }
 
-      setIsAuthenticated(true);
+      setSessionPassword(password);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -88,7 +87,7 @@ function App() {
     try {
       const headers = { 'Content-Type': 'application/json' };
       if (authStatus === 'required') {
-        headers['X-Link-Shortener-Password'] = password;
+        headers['X-Link-Shortener-Password'] = sessionPassword;
       }
 
       const response = await fetch('/api/links', {
@@ -134,7 +133,7 @@ function App() {
     return <div className="container"><p>Loading...</p></div>;
   }
 
-  if (!isAuthenticated) {
+  if (authStatus === 'required' && !sessionPassword) {
     return (
       <div className="container">
         <div className="login-card">
