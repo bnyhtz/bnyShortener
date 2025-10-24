@@ -180,7 +180,7 @@ export async function onRequestPut(context) {
       });
     }
 
-    let { url, path } = await request.json();
+  let { url, path, newPath, domain } = await request.json();
 
     // 1. Validate and normalize input
     if (!path || !url) {
@@ -193,7 +193,7 @@ export async function onRequestPut(context) {
       url = `https://${url}`;
     }
 
-    // 2. Check if the link exists
+    // 2. Check if the link exists (path is the existing key)
     const existingData = await env.LINKS.get(path);
     if (!existingData) {
       return new Response(JSON.stringify({ error: 'The specified path does not exist.' }), {
@@ -215,15 +215,63 @@ export async function onRequestPut(context) {
       }
     }
 
-    // 4. Update the link and make it permanent by removing the timestamp
-    const permanentLinkData = { url: url, embeds: linkData.embeds }; // Preserve embed setting
-    await env.LINKS.put(path, JSON.stringify(permanentLinkData));
+    // 4. Validate newPath (if provided) and domain (if provided)
+    let targetPath = path;
+    if (newPath && String(newPath) !== String(path)) {
+      if (!/^[a-zA-Z0-9/-]+$/.test(newPath)) {
+        return new Response(JSON.stringify({ error: 'New path can only contain letters, numbers, slashes, and dashes.' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      // ensure newPath doesn't already exist
+      const exists = await env.LINKS.get(newPath);
+      if (exists) {
+        return new Response(JSON.stringify({ error: `The new path "${newPath}" is already in use.` }), {
+          status: 409,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      targetPath = newPath;
+    }
 
-    // 5. Return the successful response
+    // validate domain if provided
+    let storedDomain = linkData.domain || null;
+    if (domain) {
+      if (env && env.DOMAINS) {
+        const allowed = env.DOMAINS.split(',').map(s => s.trim()).filter(Boolean);
+        if (!allowed.includes(domain)) {
+          return new Response(JSON.stringify({ error: 'The specified domain is not allowed.' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+      }
+      storedDomain = domain;
+    }
+
+    // 5. Update the link and make it permanent by removing the timestamp
+    const permanentLinkData = {
+      url: url,
+      embeds: linkData.embeds,
+      metadata: linkData.metadata || null,
+      cloaking: linkData.cloaking || false,
+      domain: storedDomain,
+      createdAt: linkData.createdAt || Date.now(),
+    };
+
+    // Put new key then delete old key if renaming
+    await env.LINKS.put(targetPath, JSON.stringify(permanentLinkData));
+    if (targetPath !== path) {
+      await env.LINKS.delete(path);
+    }
+
+    // 6. Return the successful response
     return new Response(JSON.stringify({
       message: 'Link updated successfully.',
-      path: path,
+      path: targetPath,
       newUrl: url,
+      domain: storedDomain,
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

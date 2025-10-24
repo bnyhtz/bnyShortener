@@ -17,13 +17,15 @@ export function DialogProvider({ children }) {
     });
   }, [close]);
 
-  const prompt = useCallback((message, defaultValue = '', title = 'Input') => {
+  const prompt = useCallback((messageOrOptions, defaultValue = '', title = 'Input') => {
+    // support calling prompt(message, defaultValue, title) or prompt({ message, defaultValue, title, inputType })
+    const opts = typeof messageOrOptions === 'object' ? messageOrOptions : { message: messageOrOptions, defaultValue, title };
     return new Promise((resolve) => {
-      let inputVal = defaultValue;
+      let inputVal = opts.defaultValue || '';
       const onChange = (v) => { inputVal = v; };
       const onOk = () => { resolve(inputVal); close(); };
       const onCancel = () => { resolve(null); close(); };
-      setDialog({ type: 'prompt', title, message, defaultValue, onChange, actions: [ { label: 'Cancel', onClick: onCancel, className: 'secondary' }, { label: 'OK', onClick: onOk, className: 'primary' } ] });
+      setDialog({ type: 'prompt', title: opts.title || 'Input', message: opts.message, defaultValue: opts.defaultValue, inputType: opts.inputType, onChange, actions: [ { label: 'Cancel', onClick: onCancel, className: 'secondary' }, { label: 'OK', onClick: onOk, className: 'primary' } ] });
     });
   }, [close]);
 
@@ -70,9 +72,15 @@ function ModalRenderer({ dialog, onClose }) {
   return (
     <Modal open={true} title={dialog.title} actions={actions} onClose={onClose}>
       <div style={{ marginBottom: '1rem' }}>{dialog.message}</div>
-      {dialog.type === 'prompt' && (
-        <input autoFocus value={inputValue} onChange={(e) => { setInputValue(e.target.value); if (dialog.onChange) dialog.onChange(e.target.value); }} style={{ width: '100%', padding: '0.75rem', boxSizing: 'border-box' }} />
-      )}
+          {dialog.type === 'prompt' && (
+            <input
+              autoComplete="off"
+              type={dialog.inputType || 'text'}
+              value={inputValue}
+              onChange={(e) => { setInputValue(e.target.value); if (dialog.onChange) dialog.onChange(e.target.value); }}
+              style={{ width: '100%', padding: '0.75rem', boxSizing: 'border-box' }}
+            />
+          )}
     </Modal>
   );
 }

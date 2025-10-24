@@ -9,9 +9,10 @@ export function confirm(message, title) {
   return _api.confirm(message, title);
 }
 
-export function prompt(message, defaultValue, title) {
+export function prompt(message, defaultValue = '', title = 'Input', options = {}) {
   if (!_api) throw new Error('Dialog API not initialized');
-  return _api.prompt(message, defaultValue, title);
+  // options: { inputType: 'text' | 'password' }
+  return _api.prompt({ message, defaultValue, title, inputType: options.inputType });
 }
 
 export function alert(message, title) {

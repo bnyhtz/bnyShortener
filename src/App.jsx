@@ -320,85 +320,83 @@ function App() {
             <h2>Advanced settings</h2>
             <svg className={`chevron ${showAdvanced ? 'expanded' : ''}`} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </div>
-          {showAdvanced && (
-            <>
-              <div className="setting-item">
-                <label htmlFor="embed-toggle">Enable link previews (embeds)</label>
-                <label className="switch">
+          <div className={`advanced ${showAdvanced ? 'expanded' : ''}`} aria-hidden={!showAdvanced}>
+            <div className="setting-item">
+              <label htmlFor="embed-toggle">Enable link previews (embeds)</label>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  id="embed-toggle"
+                  checked={enableEmbeds}
+                  onChange={() => setEnableEmbeds(!enableEmbeds)}
+                />
+                <span className="slider"></span>
+              </label>
+            </div>
+            <div className="setting-item">
+              <label htmlFor="metadata-toggle">Enable custom metadata</label>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  id="metadata-toggle"
+                  checked={enableMetadata}
+                  onChange={() => setEnableMetadata(!enableMetadata)}
+                />
+                <span className="slider"></span>
+              </label>
+            </div>
+            {enableMetadata && (
+              <>
+                <div className="form-group">
+                  <label htmlFor="metadataTitle">Title</label>
                   <input
-                    type="checkbox"
-                    id="embed-toggle"
-                    checked={enableEmbeds}
-                    onChange={() => setEnableEmbeds(!enableEmbeds)}
+                    type="text"
+                    id="metadataTitle"
+                    value={metadataTitle}
+                    onChange={(e) => setMetadataTitle(e.target.value)}
+                    disabled={loading}
                   />
-                  <span className="slider"></span>
-                </label>
-              </div>
-              <div className="setting-item">
-                <label htmlFor="metadata-toggle">Enable custom metadata</label>
-                <label className="switch">
+                </div>
+                <div className="form-group">
+                  <label htmlFor="metadataDescription">Description</label>
                   <input
-                    type="checkbox"
-                    id="metadata-toggle"
-                    checked={enableMetadata}
-                    onChange={() => setEnableMetadata(!enableMetadata)}
+                    type="text"
+                    id="metadataDescription"
+                    value={metadataDescription}
+                    onChange={(e) => setMetadataDescription(e.target.value)}
+                    disabled={loading}
                   />
-                  <span className="slider"></span>
-                </label>
-              </div>
-              {enableMetadata && (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="metadataTitle">Title</label>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="metadataImage">Favicon/Image URL</label>
+                  <input
+                    type="url"
+                    id="metadataImage"
+                    value={metadataImage}
+                    onChange={(e) => setMetadataImage(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+                <div className="setting-item">
+                  <div className="setting-label-group">
+                    <label htmlFor="cloaking-toggle">Enable link cloaking</label>
+                    <p className="cloaking-note">
+                      Note: Link cloaking may not work for websites that have strict security policies (like Google or Facebook).
+                    </p>
+                  </div>
+                  <label className="switch">
                     <input
-                      type="text"
-                      id="metadataTitle"
-                      value={metadataTitle}
-                      onChange={(e) => setMetadataTitle(e.target.value)}
-                      disabled={loading}
+                      type="checkbox"
+                      id="cloaking-toggle"
+                      checked={enableCloaking}
+                      onChange={() => setEnableCloaking(!enableCloaking)}
                     />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="metadataDescription">Description</label>
-                    <input
-                      type="text"
-                      id="metadataDescription"
-                      value={metadataDescription}
-                      onChange={(e) => setMetadataDescription(e.target.value)}
-                      disabled={loading}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="metadataImage">Favicon/Image URL</label>
-                    <input
-                      type="url"
-                      id="metadataImage"
-                      value={metadataImage}
-                      onChange={(e) => setMetadataImage(e.target.value)}
-                      disabled={loading}
-                    />
-                  </div>
-                  <div className="setting-item">
-                    <div className="setting-label-group">
-                      <label htmlFor="cloaking-toggle">Enable link cloaking</label>
-                      <p className="cloaking-note">
-                        Note: Link cloaking may not work for websites that have strict security policies (like Google or Facebook).
-                      </p>
-                    </div>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        id="cloaking-toggle"
-                        checked={enableCloaking}
-                        onChange={() => setEnableCloaking(!enableCloaking)}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                </>
-              )}
-            </>
-          )}
+                    <span className="slider"></span>
+                  </label>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="footer">

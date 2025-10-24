@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { useNotify } from './notifications/NotificationProvider';
 import { confirm, prompt, alert as dlgAlert } from './dialogs/dialogs';
+import EditModal from './components/EditModal';
 
 export default function Manage() {
   const [domains, setDomains] = useState([]);
@@ -16,6 +17,8 @@ export default function Manage() {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginRemember, setLoginRemember] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -76,7 +79,7 @@ export default function Manage() {
     if (passwordProtected) {
       // prefer server-side session; if not authenticated, prompt and use legacy header
       if (!sessionAuthenticated) {
-        const pwd = await prompt('Enter admin password to delete:');
+        const pwd = await prompt('Enter admin password to delete:', '', 'Password', { inputType: 'password' });
         if (!pwd) return;
         headers['X-Link-Shortener-Password'] = pwd;
       }
@@ -91,25 +94,35 @@ export default function Manage() {
     }
   };
 
-  const doEdit = async (path, currentUrl) => {
-    const newUrl = await prompt('Enter new destination URL', currentUrl);
-    if (!newUrl) return;
+  const doEdit = (link) => {
+    setEditing(link);
+  };
+
+  const saveEdit = async ({ path, newPath, domain, url }) => {
+    setSavingEdit(true);
     let headers = { 'Content-Type': 'application/json' };
     if (passwordProtected) {
       if (!sessionAuthenticated) {
-        const pwd = await prompt('Enter admin password to edit:');
-        if (!pwd) return;
+        const pwd = await prompt('Enter admin password to edit:', '', 'Password', { inputType: 'password' });
+        if (!pwd) { setSavingEdit(false); return; }
         headers['X-Link-Shortener-Password'] = pwd;
       }
     }
 
-    const resp = await fetch('/api/links', { method: 'PUT', headers, body: JSON.stringify({ path, url: newUrl }) });
-    if (resp.ok) {
-      try { notify('Updated', { duration: 2500 }); } catch (e) {}
-      fetchLinks(filterDomain || null);
-    } else {
-      const js = await resp.json().catch(() => ({}));
-      try { notify(js.error || 'Update failed', { duration: 4000 }); } catch (er) { dlgAlert(js.error || 'Update failed'); }
+    try {
+      const resp = await fetch('/api/links', { method: 'PUT', headers, body: JSON.stringify({ path, newPath, url, domain }) });
+      if (resp.ok) {
+        try { notify('Updated', { duration: 2500 }); } catch (e) {}
+        fetchLinks(filterDomain || null);
+        setEditing(null);
+      } else {
+        const js = await resp.json().catch(() => ({}));
+        try { notify(js.error || 'Update failed', { duration: 4000 }); } catch (er) { dlgAlert(js.error || 'Update failed'); }
+      }
+    } catch (e) {
+      try { notify('Update failed', { duration: 3000 }); } catch (er) { dlgAlert('Update failed'); }
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -159,16 +172,9 @@ export default function Manage() {
   return (
     <div className="container">
       <div className="header">
-        <h1>Manage links</h1>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <select value={filterDomain} onChange={(e) => setFilterDomain(e.target.value)}>
-            <option value="">All domains</option>
-            {domains.map(d => <option key={d} value={d}>{d}</option>)}
-          </select>
-          <input placeholder="Search path or URL" value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginLeft: '0.5rem' }} />
-          <button className="primary" onClick={() => fetchLinks(filterDomain || null)} style={{ marginLeft: '0.5rem' }} disabled={linksLoading}>{linksLoading ? 'Loading...' : 'Refresh'}</button>
           {passwordProtected && !sessionAuthenticated && (
-            <div style={{ display: 'flex', gap: '0.5rem', marginLeft: '1rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <input type="text" placeholder="Username" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} style={{ padding: '0.5rem' }} />
               <input type="password" placeholder="Password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} style={{ padding: '0.5rem' }} />
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -182,7 +188,7 @@ export default function Manage() {
           )}
           {sessionAuthenticated && (
             <div style={{ marginLeft: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <span className="small-muted">Admin</span>
+              <button className="secondary" onClick={() => { try { window.location.pathname = '/'; } catch (e) {} }}>Create link</button>
               <button className="secondary" onClick={handleLogout}>Logout</button>
             </div>
           )}
@@ -192,6 +198,14 @@ export default function Manage() {
   {/* Notifications are rendered by NotificationProvider */}
 
       <div className="card">
+        <div style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <select value={filterDomain} onChange={(e) => setFilterDomain(e.target.value)}>
+            <option value="">All domains</option>
+            {domains.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
+          <input placeholder="Search path or URL" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <button className="primary" onClick={() => fetchLinks(filterDomain || null)} disabled={linksLoading}>{linksLoading ? 'Loading...' : 'Refresh'}</button>
+        </div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -229,6 +243,15 @@ export default function Manage() {
           </table>
         </div>
       </div>
+      {editing && (
+        <EditModal
+          open={!!editing}
+          initial={{ path: editing.path, domain: editing.domain, url: editing.originalUrl || editing.originalUrl }}
+          saving={savingEdit}
+          onClose={() => setEditing(null)}
+          onSave={saveEdit}
+        />
+      )}
     </div>
   );
 }

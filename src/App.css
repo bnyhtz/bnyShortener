@@ -5,6 +5,17 @@
   padding-bottom: 4rem;
 }
 
+/* Dark mode & blurple theme */
+body {
+  /* solid blurple background (variant) */
+  background: #2F3684;
+  color: #F5F7FA; /* off-white */
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -13,13 +24,37 @@
 }
 
 .card {
-  background-color: #ffffff;
+  /* slightly darker card on darker background */
+  background-color: rgba(255,255,255,0.04);
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
   padding: 2rem;
   margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 0;
   /* entrance animation */
   animation: fadeUp 320ms cubic-bezier(.2,.9,.2,1) both;
+}
+
+/* subtle purple glow under cards to help them pop */
+.card::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -18px;
+  width: 140%;
+  height: 44px;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(47,54,132,0.16), rgba(47,54,132,0.06) 40%, transparent 70%);
+  filter: blur(18px);
+  z-index: -1;
+}
+
+/* stronger glow when keyboard-focusing inside the card */
+.card:focus-within::after {
+  background: radial-gradient(ellipse at center, rgba(47,54,132,0.28), rgba(47,54,132,0.12) 36%, transparent 70%);
+  filter: blur(24px);
 }
 
 .card-header {
@@ -55,7 +90,7 @@
 
 .setting-item label {
   font-weight: 700;
-  color: #0B1A3D;
+  color: #F5F7FA;
 }
 
 /* The switch - https://www.w3schools.com/howto/howto_css_switch.asp */
@@ -124,23 +159,37 @@ input:checked + .slider:before {
   margin-bottom: 0.5rem;
   font-weight: 700;
   font-size: 0.875rem;
-  color: #566280;
+  color: #F5F7FA;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 1px solid #A5B1C9;
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: 4px;
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
+  background: transparent;
+  color: #F5F7FA;
 }
 
 .form-group input:focus {
-  border-color: #0056FF;
-  box-shadow: 0 0 0 3px rgba(0, 86, 255, 0.2);
+  border-color: rgba(255,255,255,0.3);
+  box-shadow: 0 0 0 6px rgba(0,0,0,0.12);
   outline: none;
+}
+
+/* better visible focus for keyboard users */
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(47,54,132,0.22);
+  border-color: rgba(255,255,255,0.4);
+}
+
+/* primary buttons get a subtle glow too when focused */
+button.primary:focus-visible {
+  box-shadow: 0 6px 30px rgba(47,54,132,0.22), 0 0 0 4px rgba(47,54,132,0.18);
 }
 
 .short-link-group {
@@ -152,11 +201,11 @@ input:checked + .slider:before {
 .short-link-group .domain-select {
   flex-shrink: 0;
   padding: 0.75rem 1rem;
-  border: 1px solid #A5B1C9;
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 4px;
-  background-color: #F8F9FC;
+  background-color: rgba(0,0,0,0.12);
   font-weight: 700;
-  color: #0B1A3D;
+  color: #F5F7FA;
 }
 
 .short-link-group .domain-select select {
@@ -190,17 +239,17 @@ input:checked + .slider:before {
 
 .copy-btn {
   background: transparent;
-  border: 1px solid #E9EDF1;
+  border: 1px solid rgba(255,255,255,0.12);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
   cursor: pointer;
-  color: #0B1A3D;
+  color: #F5F7FA;
 }
 
-.copy-btn:hover { background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+.copy-btn:hover { background: rgba(255,255,255,0.04); }
 
 .open-btn {
-  background: #0056FF;
+  background: #ff996c;
   color: white;
   border: none;
   padding: 0.5rem 0.75rem;
@@ -208,11 +257,11 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 
-.open-btn:hover { background: #0045cc; }
+.open-btn:hover { background: #D97150; }
 
 .small-muted {
   font-size: 0.85rem;
-  color: #566280;
+  color: #E6E9F2;
 }
 
 .spinner {
@@ -233,8 +282,8 @@ input:checked + .slider:before {
   position: fixed;
   right: 1rem;
   bottom: 1rem;
-  background: #111827;
-  color: white;
+  background: rgba(0,0,0,0.5);
+  color: #F5F7FA;
   padding: 0.75rem 1rem;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(2,6,23,0.5);
@@ -247,8 +296,8 @@ input:checked + .slider:before {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #111827;
-  color: white;
+  background: rgba(0,0,0,0.6);
+  color: #F5F7FA;
   padding: 0.6rem 0.75rem;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(2,6,23,0.5);
@@ -293,16 +342,16 @@ input:checked + .slider:before {
   align-items: center;
   gap: 1rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #E9EDF1;
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 button.primary {
-  background-color: #0056FF;
+  background-color: #2F3684; /* accent */
   color: #ffffff;
 }
 
 button.primary:hover {
-  background-color: #0045cc;
+  background-color: #273065; /* slightly darker hover */
 }
 
 button.primary:disabled {
@@ -312,13 +361,44 @@ button.primary:disabled {
 
 button.secondary {
   background-color: transparent;
-  color: #566280;
+  color: #F5F7FA;
   border: none;
 }
 
 button.secondary:hover {
-  color: #0B1A3D;
+  color: #ffffff;
 }
+
+/* Links */
+a { color: #ff996c; }
+a:visited { color: #D97150; }
+
+/* Typography adjustments for dark mode */
+label, input, select, button { font-family: Arial, sans-serif; font-weight: 700; color: #F5F7FA; }
+
+/* Headings should be pure white for contrast */
+h1, h2, h3, h4, h5, h6 { color: #ffffff; }
+
+/* Table styles */
+table { color: #F5F7FA; }
+th { color: #F5F7FA; }
+td a { color: #ff996c; }
+
+table thead th {
+  padding: 0.75rem;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+table tbody td { padding: 0.75rem; vertical-align: middle; }
+table tbody tr { border-top: 1px solid rgba(255,255,255,0.04); }
+table tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+.header { margin-bottom: 0.75rem; }
+.card { padding: 1.25rem; }
+.short-link-group input, .form-group input, select { min-height: 40px; }
+
+/* Make modal content inputs match dark theme */
+.modal input { background: transparent; color: #F5F7FA; border: 1px solid rgba(255,255,255,0.08); padding: 0.6rem 0.75rem; border-radius: 4px; }
 
 .error {
   color: #d93025;
@@ -334,8 +414,8 @@ button.secondary:hover {
   margin-top: 2rem;
   padding: 1.5rem;
   border-radius: 8px;
-  background-color: #F8F9FC;
-  border: 1px solid #E9EDF1;
+  background-color: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,0.06);
   text-align: left;
   animation: pop 260ms cubic-bezier(.2,.9,.2,1) both;
 }
@@ -343,19 +423,49 @@ button.secondary:hover {
 .result p {
   margin: 0 0 0.75rem 0;
   font-weight: 700;
-  color: #0B1A3D;
+  color: #F5F7FA;
 }
 
 .result a {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #0056FF;
+  color: #ff996c;
   word-break: break-all;
   text-decoration: none;
 }
 
 .result a:hover {
   text-decoration: underline;
+}
+
+/* advanced settings slide-down animation */
+.advanced {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: max-height 320ms cubic-bezier(.2,.9,.2,1), opacity 260ms ease, transform 260ms ease;
+}
+.advanced.expanded {
+  max-height: 1200px; /* large enough to contain content */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* smooth spacing inside advanced area */
+.advanced .setting-item,
+.advanced .form-group {
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+.advanced:not(.expanded) .setting-item,
+.advanced:not(.expanded) .form-group {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+.advanced.expanded .setting-item,
+.advanced.expanded .form-group {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .setting-label-group {
@@ -372,7 +482,7 @@ button.secondary:hover {
 .cloaking-note {
   font-size: 0.8rem;
   font-weight: 400;
-  color: #566280;
+  color: #E6E9F2;
   margin: 0;
   text-align: left;
 }
@@ -390,9 +500,9 @@ button.secondary:hover {
   margin: 2rem auto;
   padding: 2.5rem;
   text-align: center;
-  background-color: #ffffff;
+  background-color: rgba(0,0,0,0.12);
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 20px rgba(2,6,23,0.4);
   box-sizing: border-box;
   animation: fadeUp 320ms cubic-bezier(.2,.9,.2,1) both;
 }
@@ -403,7 +513,7 @@ button.secondary:hover {
 
 .login-card p {
   margin-bottom: 2rem;
-  color: #566280;
+  color: #E6E9F2;
 }
 
 @media (max-width: 600px) {
@@ -441,14 +551,15 @@ button.secondary:hover {
   z-index: 10000;
 }
 .modal {
-  background: #fff;
+  background: #0b1020; /* dark modal panel */
+  color: #F5F7FA;
   border-radius: 8px;
   padding: 1rem;
   width: 90%;
   max-width: 520px;
-  box-shadow: 0 12px 40px rgba(2,6,23,0.4);
+  box-shadow: 0 12px 40px rgba(2,6,23,0.6);
 }
-.modal-header { padding-bottom: 0.5rem; border-bottom: 1px solid #EEF2F7; }
+.modal-header { padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .modal-body { padding: 1rem 0; }
 .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; padding-top: 0.5rem; }
 
