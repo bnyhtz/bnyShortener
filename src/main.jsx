@@ -7,33 +7,51 @@ import { NotificationProvider } from './notifications/NotificationProvider';
 import { DialogProvider } from './dialogs/DialogProvider';
 
 const path = window.location.pathname;
-
 import Manage from './Manage.jsx';
+import Login from './Login.jsx';
 
-// Before rendering, if we're trying to open the dashboard, ask the server if the
-// client has a valid session cookie. If not, redirect to home.
+// Simple pre-render routing and session checks:
 (async () => {
-  if (path === '/dash') {
-    try {
-      const resp = await fetch('/api/auth/session', { cache: 'no-store' });
-      const js = await resp.json();
-      const fromMain = (() => { try { return !!window.sessionStorage.getItem('loggedInFromMain'); } catch (e) { return false; } })();
-      if (!js || !js.authenticated || !fromMain) {
-        window.location.pathname = '/';
-        return;
-      }
-    } catch (e) {
-      // if session check fails, redirect to home
-      window.location.pathname = '/';
-      return;
-    }
+  // handle logout route: call server and redirect to login
+  if (path === '/logout') {
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (e) {}
+    window.location.pathname = '/login';
+    return;
   }
 
+  // If we're on the login page, just render login (no session check)
+  if (path === '/login') {
+    createRoot(document.getElementById('root')).render(
+      <NotificationProvider>
+        <DialogProvider>
+          <StrictMode>
+            <Login />
+          </StrictMode>
+        </DialogProvider>
+      </NotificationProvider>,
+    );
+    return;
+  }
+
+  // For all other pages, require an authenticated session. If not authenticated, redirect to /login.
+  try {
+    const resp = await fetch('/api/auth/session', { cache: 'no-store' });
+    const js = await resp.json();
+    if (!js || !js.authenticated) {
+      window.location.pathname = '/login';
+      return;
+    }
+  } catch (e) {
+    window.location.pathname = '/login';
+    return;
+  }
+
+  // At this point we are authenticated — render the app. Default route will be /dash.
   createRoot(document.getElementById('root')).render(
     <NotificationProvider>
       <DialogProvider>
         <StrictMode>
-          {path === '/' ? <App /> : (path === '/dash' ? <Manage /> : <NotFound />)}
+          {path === '/dash' ? <Manage /> : <Manage />}
         </StrictMode>
       </DialogProvider>
     </NotificationProvider>,

@@ -400,9 +400,11 @@ function App() {
         </div>
 
         <div className="footer">
-          <button type="button" onClick={handleCancel} className="secondary" disabled={loading}>
-            Cancel
-          </button>
+          {error && (
+            <button type="button" className="primary" onClick={handleCancel} disabled={loading}>
+              Cancel
+            </button>
+          )}
           <button type="submit" className="primary" disabled={loading}>
             {loading ? (
               <span className="btn-icon"><span className="spinner"></span> Creating...</span>

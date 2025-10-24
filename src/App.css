@@ -2,7 +2,8 @@
   width: 100%;
   max-width: 800px;
   margin: 0 1rem;
-  padding-bottom: 4rem;
+  /* leave room for the fixed site footer */
+  padding-bottom: 110px;
 }
 
 /* Dark mode & blurple theme */
@@ -345,13 +346,43 @@ button.primary:focus-visible {
   border-top: 1px solid rgba(255,255,255,0.06);
 }
 
-button.primary {
-  background-color: #2F3684; /* accent */
+/* persistent site footer fixed to bottom of viewport */
+.site-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
   color: #ffffff;
+  z-index: 10002;
+  /* include safe-area inset for mobile devices */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
-button.primary:hover {
-  background-color: #273065; /* slightly darker hover */
+/* Make all buttons use the primary/action button style for a consistent UI */
+button, .copy-btn, .open-btn, .secondary, .snackbar-action {
+  background-color: #2F3684; /* primary accent */
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover, .copy-btn:hover, .open-btn:hover, .secondary:hover, .snackbar-action:hover {
+  background-color: #273065;
+}
+
+button:disabled, .copy-btn:disabled, .open-btn:disabled {
+  background-color: #A5B1C9;
+  cursor: not-allowed;
 }
 
 button.primary:disabled {
@@ -397,17 +428,81 @@ table tbody tr:hover { background: rgba(255,255,255,0.02); }
 .card { padding: 1.25rem; }
 .short-link-group input, .form-group input, select { min-height: 40px; }
 
+/* Manage page: make links white */
+.manage-page a { color: #ffffff; }
+.manage-page a:visited { color: #ffffffcc; }
+
+/* Style dropdowns used in manage page and edit modal */
+.domain-select select, .card-controls select, .manage-page select {
+  background: #5760C3;
+  color: #ffffff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
+  font-weight: 700;
+}
+
+/* Make inputs in controls visually match dropdown */
+.card-controls input, .manage-page .card-controls input {
+  background: rgba(255,255,255,0.02);
+  color: #ffffff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Ensure EditModal domain select matches style */
+.modal .domain-select select {
+  background: #5760C3;
+  color: #ffffff;
+}
+
 /* Make modal content inputs match dark theme */
 .modal input { background: transparent; color: #F5F7FA; border: 1px solid rgba(255,255,255,0.08); padding: 0.6rem 0.75rem; border-radius: 4px; }
 
 .error {
-  color: #d93025;
+  /* Use a very dark navy for better readability on the pale error background */
+  color: #0b1a3d; /* dark navy (better than plain black on some monitors) */
   background-color: #fbe9e7;
   padding: 1rem;
   border-radius: 4px;
   margin-top: 1.5rem;
-  font-weight: 500;
+  font-weight: 800;
   text-align: left;
+}
+
+/* Ensure links or other nested elements inherit the visible color */
+.error, .error * {
+  color: inherit !important;
+}
+
+/* Login card specific override: the login card uses a light background error box inside a dark card
+   — make sure the error text is visible (force high specificity) */
+.login-card .error {
+  color: #0b1a3d !important;
+  background-color: #fbe9e7 !important;
+  padding: 1rem !important;
+}
+
+/* Modal-specific overrides: modal uses a dark background so keep error text readable there */
+.modal .error {
+  color: #ffb4b4; /* light pink/red for modal context */
+  background: transparent;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+/* validation errors (small inline hints) default to dark for light contexts */
+.validation-error {
+  font-size: 0.8rem;
+  color: #0b1a3d;
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+/* inside modal keep validation hints colored red for contrast */
+.modal .validation-error {
+  color: #d93025;
 }
 
 .result {
@@ -489,9 +584,14 @@ table tbody tr:hover { background: rgba(255,255,255,0.02); }
 
 .validation-error {
   font-size: 0.8rem;
-  color: #d93025;
+  color: #0b1a3d;
   margin-top: 0.5rem;
   text-align: left;
+}
+
+/* inside modal keep validation hints colored red for contrast */
+.modal .validation-error {
+  color: #d93025;
 }
 
 .login-card {
