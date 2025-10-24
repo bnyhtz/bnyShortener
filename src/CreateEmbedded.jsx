@@ -15,12 +15,13 @@ export default function CreateEmbedded({ onCreated }) {
   const [metadataDescription, setMetadataDescription] = useState('');
   const [metadataImage, setMetadataImage] = useState('');
   const [enableCloaking, setEnableCloaking] = useState(false);
+  const [advancedExpanded, setAdvancedExpanded] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
         const resp = await fetch('/api/domains', { cache: 'no-store' });
-        const js = await resp.json();
+        const js = await resp.json().catch(() => ({}));
         if (js && Array.isArray(js.domains) && js.domains.length) {
           setDomains(js.domains);
           const host = window.location.host;
@@ -31,6 +32,12 @@ export default function CreateEmbedded({ onCreated }) {
       } catch (e) {}
     })();
   }, []);
+
+  useEffect(() => {
+    try {
+      if (selectedDomain) window.localStorage.setItem('lastSelectedDomain', selectedDomain);
+    } catch (e) {}
+  }, [selectedDomain]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,8 +62,12 @@ export default function CreateEmbedded({ onCreated }) {
         headers,
         body: JSON.stringify({ url, customPath, embeds: enableEmbeds, metadata, cloaking: enableCloaking, domain: selectedDomain })
       });
-      const js = await response.json();
-      if (!response.ok) throw new Error(js.error || 'Create failed');
+      const text = await response.text();
+      let js = {};
+      if (text) {
+        try { js = JSON.parse(text); } catch { js = {}; }
+      }
+      if (!response.ok) throw new Error(js.error || response.statusText || 'Create failed');
       setResult(js);
       onCreated && onCreated(js);
       setUrl(''); setCustomPath('');
@@ -74,12 +85,17 @@ export default function CreateEmbedded({ onCreated }) {
 
   return (
     <div className="card create-panel">
-      <div className="card-header"><h2>Create a new link</h2></div>
+      <div className="card-header">
+        <h2>Create a new link</h2>
+        <button type="button" className={`chevron ${advancedExpanded ? 'expanded' : ''}`} onClick={() => setAdvancedExpanded(v => !v)} aria-expanded={advancedExpanded} aria-label="Toggle advanced settings">▾</button>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="url">Destination URL</label>
           <input type="url" id="url" value={url} onChange={(e)=>setUrl(e.target.value)} placeholder="https://example.com/long" required disabled={loading} />
         </div>
+
         <div className="form-group">
           <label>Short link</label>
           <div className="short-link-group">
@@ -94,6 +110,36 @@ export default function CreateEmbedded({ onCreated }) {
             <input type="text" id="customPath" value={customPath} onChange={(e)=>{ const newPath = e.target.value; if(!/^[a-zA-Z0-9/-]*$/.test(newPath)){ setIsPathValid(false); } else setIsPathValid(true); setCustomPath(newPath.replace(/[^a-zA-Z0-9/-]/g,'')); }} placeholder="my-custom-link" disabled={loading} />
           </div>
           {!isPathValid && <p className="validation-error">Only letters, numbers, slashes, and dashes are allowed.</p>}
+        </div>
+
+        <div className={`advanced ${advancedExpanded ? 'expanded' : ''}`}>
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="checkbox" checked={enableEmbeds} onChange={(e)=>setEnableEmbeds(e.target.checked)} />
+              <span style={{ fontWeight: 700 }}>Enable embeds</span>
+            </label>
+          </div>
+
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="checkbox" checked={enableMetadata} onChange={(e)=>setEnableMetadata(e.target.checked)} />
+              <span style={{ fontWeight: 700 }}>Add custom metadata (title/description/image)</span>
+            </label>
+            {enableMetadata && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <input placeholder="Title" value={metadataTitle} onChange={(e)=>setMetadataTitle(e.target.value)} />
+                <input placeholder="Description" value={metadataDescription} onChange={(e)=>setMetadataDescription(e.target.value)} />
+                <input placeholder="Image URL" value={metadataImage} onChange={(e)=>setMetadataImage(e.target.value)} />
+              </div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input type="checkbox" checked={enableCloaking} onChange={(e)=>setEnableCloaking(e.target.checked)} />
+              <span style={{ fontWeight: 700 }}>Enable cloaking (show original URL on visit)</span>
+            </label>
+          </div>
         </div>
 
         <div className="card-controls" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>

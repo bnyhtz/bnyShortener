@@ -437,229 +437,72 @@ table tbody tr:hover { background: rgba(255,255,255,0.02); }
   background: #5760C3;
   color: #ffffff;
   padding: 0.6rem 0.8rem;
-  border-radius: 6px;
+  border-radius: 12px; /* more round */
   border: 1px solid rgba(255,255,255,0.06);
   font-weight: 700;
 }
 
 /* Make inputs in controls visually match dropdown */
 .card-controls input, .manage-page .card-controls input {
-  background: rgba(255,255,255,0.02);
+  background: #5760C3; /* match dropdown */
   color: #ffffff;
   padding: 0.6rem 0.8rem;
-  border-radius: 6px;
+  border-radius: 12px; /* more round */
   border: 1px solid rgba(255,255,255,0.06);
+  caret-color: #ffffff;
+}
+.card-controls input::placeholder, .manage-page .card-controls input::placeholder {
+  color: rgba(255,255,255,0.9);
 }
 
-/* Ensure EditModal domain select matches style */
+/* Ensure EditModal domain select matches style and roundness */
 .modal .domain-select select {
   background: #5760C3;
   color: #ffffff;
+  border-radius: 12px; /* more round */
 }
 
-/* Make modal content inputs match dark theme */
-.modal input { background: transparent; color: #F5F7FA; border: 1px solid rgba(255,255,255,0.08); padding: 0.6rem 0.75rem; border-radius: 4px; }
-
-.error {
-  /* Use a very dark navy for better readability on the pale error background */
-  color: #0b1a3d; /* dark navy (better than plain black on some monitors) */
-  background-color: #fbe9e7;
-  padding: 1rem;
-  border-radius: 4px;
-  margin-top: 1.5rem;
-  font-weight: 800;
-  text-align: left;
-}
-
-/* Ensure links or other nested elements inherit the visible color */
-.error, .error * {
-  color: inherit !important;
-}
-
-/* Login card specific override: the login card uses a light background error box inside a dark card
-   — make sure the error text is visible (force high specificity) */
-.login-card .error {
-  color: #0b1a3d !important;
-  background-color: #fbe9e7 !important;
-  padding: 1rem !important;
-}
-
-/* Modal-specific overrides: modal uses a dark background so keep error text readable there */
-.modal .error {
-  color: #ffb4b4; /* light pink/red for modal context */
-  background: transparent;
-  padding: 0;
-  margin-top: 0.5rem;
-}
-
-/* validation errors (small inline hints) default to dark for light contexts */
-.validation-error {
-  font-size: 0.8rem;
-  color: #0b1a3d;
-  margin-top: 0.5rem;
-  text-align: left;
-}
-
-/* inside modal keep validation hints colored red for contrast */
-.modal .validation-error {
-  color: #d93025;
-}
-
-.result {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  border-radius: 8px;
-  background-color: rgba(0,0,0,0.12);
+/* Unify create panel domain dropdown to match filter style (override older styles) */
+.short-link-group .domain-select { background: transparent; border: 0; padding: 0; }
+.short-link-group .domain-select select {
+  appearance: none;
+  background: #5760C3 !important;
+  color: #ffffff !important;
   border: 1px solid rgba(255,255,255,0.06);
-  text-align: left;
-  animation: pop 260ms cubic-bezier(.2,.9,.2,1) both;
+  border-radius: 12px; /* more round */
+  padding: 0.6rem 0.8rem;
 }
 
-.result p {
-  margin: 0 0 0.75rem 0;
-  font-weight: 700;
-  color: #F5F7FA;
+/* Make inputs in controls visually match dropdown */
+.card-controls input, .manage-page .card-controls input {
+  background: #5760C3; /* match dropdown */
+  color: #ffffff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px; /* more round */
+  border: 1px solid rgba(255,255,255,0.06);
+  caret-color: #ffffff;
+}
+.card-controls input::placeholder, .manage-page .card-controls input::placeholder {
+  color: rgba(255,255,255,0.9);
 }
 
-.result a {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #ff996c;
-  word-break: break-all;
-  text-decoration: none;
+/* Ensure EditModal domain select matches style and roundness */
+.modal .domain-select select {
+  background: #5760C3;
+  color: #ffffff;
+  border-radius: 12px; /* more round */
 }
 
-.result a:hover {
-  text-decoration: underline;
+/* Unify create panel domain dropdown to match filter style (override older styles) */
+.short-link-group .domain-select { background: transparent; border: 0; padding: 0; }
+.short-link-group .domain-select select {
+  appearance: none;
+  background: #5760C3 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; /* more round */
+  padding: 0.6rem 0.8rem;
 }
 
-/* advanced settings slide-down animation */
-.advanced {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(-6px);
-  transition: max-height 320ms cubic-bezier(.2,.9,.2,1), opacity 260ms ease, transform 260ms ease;
-}
-.advanced.expanded {
-  max-height: 1200px; /* large enough to contain content */
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* smooth spacing inside advanced area */
-.advanced .setting-item,
-.advanced .form-group {
-  transition: opacity 260ms ease, transform 260ms ease;
-}
-.advanced:not(.expanded) .setting-item,
-.advanced:not(.expanded) .form-group {
-  opacity: 0;
-  transform: translateY(-6px);
-}
-.advanced.expanded .setting-item,
-.advanced.expanded .form-group {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.setting-label-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-right: 1rem;
-}
-
-.setting-label-group label {
-  margin-bottom: 0.25rem;
-}
-
-.cloaking-note {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: #E6E9F2;
-  margin: 0;
-  text-align: left;
-}
-
-.validation-error {
-  font-size: 0.8rem;
-  color: #0b1a3d;
-  margin-top: 0.5rem;
-  text-align: left;
-}
-
-/* inside modal keep validation hints colored red for contrast */
-.modal .validation-error {
-  color: #d93025;
-}
-
-.login-card {
-  max-width: 400px;
-  width: 100%;
-  margin: 2rem auto;
-  padding: 2.5rem;
-  text-align: center;
-  background-color: rgba(0,0,0,0.12);
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(2,6,23,0.4);
-  box-sizing: border-box;
-  animation: fadeUp 320ms cubic-bezier(.2,.9,.2,1) both;
-}
-
-.login-card h1 {
-  margin-bottom: 0.5rem;
-}
-
-.login-card p {
-  margin-bottom: 2rem;
-  color: #E6E9F2;
-}
-
-@media (max-width: 600px) {
-  .login-card {
-    margin: 1rem;
-    padding: 2rem;
-    width: calc(100% - 2rem);
-  }
-}
-
-@keyframes fadeUp {
-  from { transform: translateY(8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes pop {
-  0% { transform: scale(.985); opacity: 0; }
-  60% { transform: scale(1.02); opacity: 1; }
-  100% { transform: scale(1); }
-}
-
-@keyframes slideIn {
-  from { transform: translateY(12px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-/* Modal styles */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(2,6,23,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-}
-.modal {
-  background: #0b1020; /* dark modal panel */
-  color: #F5F7FA;
-  border-radius: 8px;
-  padding: 1rem;
-  width: 90%;
-  max-width: 520px;
-  box-shadow: 0 12px 40px rgba(2,6,23,0.6);
-}
-.modal-header { padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.modal-body { padding: 1rem 0; }
-.modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; padding-top: 0.5rem; }
+/* ...existing code... */
 
