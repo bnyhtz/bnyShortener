@@ -17,6 +17,10 @@
           <img src="/assets/icons/link.svg" alt="" class="xp-icon-img" />
           <span>Link Shortener</span>
         </button>
+        <button class="xp-icon" data-open="adminWindow" aria-label="Open Admin Tools">
+          <img src="/assets/icons/admin.svg" alt="" class="xp-icon-img" />
+          <span>Admin Tools</span>
+        </button>
         <button class="xp-icon" data-open="explorerWindow" aria-label="Open Link Explorer">
           <img src="/assets/icons/folder.svg" alt="" class="xp-icon-img" />
           <span>Link Explorer</span>
@@ -26,7 +30,10 @@
       <section id="xp-window-area" class="xp-window-area">
         <div class="xp-window" data-window="mainWindow">
           <div class="xp-titlebar" data-drag-handle>
-            <div class="xp-title">Link Shortener</div>
+            <div class="xp-titlebar-left">
+              <img src="/assets/icons/link.svg" alt="" aria-hidden="true" class="xp-titlebar-icon" />
+              <div class="xp-title">Link Shortener</div>
+            </div>
             <div class="xp-window-controls">
               <button class="xp-winbtn" data-action="minimize" aria-label="Minimize">_</button>
               <button class="xp-winbtn" data-action="maximize" aria-label="Maximize">[ ]</button>
@@ -41,13 +48,35 @@
               </div>
             </div>
           </div>
+          <div class="xp-resize-handle xp-resize-e" aria-hidden="true"></div>
+          <div class="xp-resize-handle xp-resize-s" aria-hidden="true"></div>
+          <div class="xp-resize-handle xp-resize-se" aria-hidden="true"></div>
+        </div>
+
+        <div class="xp-window is-hidden" data-window="adminWindow">
+          <div class="xp-titlebar" data-drag-handle>
+            <div class="xp-title">
+              <img src="/assets/icons/admin.svg" alt="" class="xp-title-icon" />
+              Admin Tools
+            </div>
+            <div class="xp-window-controls">
+              <button class="xp-winbtn" data-action="minimize" aria-label="Minimize">_</button>
+              <button class="xp-winbtn" data-action="maximize" aria-label="Maximize">[ ]</button>
+              <button class="xp-winbtn xp-close" data-action="close" aria-label="Close">X</button>
+            </div>
+          </div>
+          <div class="xp-window-body">
+            <div class="xp-scope">
+              <div id="admin-window-mount"></div>
+            </div>
+          </div>
         </div>
 
         <div class="xp-window is-hidden" data-window="explorerWindow">
           <div class="xp-titlebar" data-drag-handle>
-            <div class="xp-title">
-              <img src="/assets/icons/folder.svg" alt="" class="xp-title-icon" />
-              Link Explorer
+            <div class="xp-titlebar-left">
+              <img src="/assets/icons/folder.svg" alt="" aria-hidden="true" class="xp-titlebar-icon" />
+              <div class="xp-title">Link Explorer</div>
             </div>
             <div class="xp-window-controls">
               <button class="xp-winbtn" data-action="minimize" aria-label="Minimize">_</button>
@@ -68,21 +97,43 @@
                   <label>Address</label>
                   <input type="text" readonly value="C:\\Links\\All Links" />
                 </div>
-                <div class="explorer-filter-slot" id="explorer-filter-slot"></div>
               </div>
               <div class="explorer-body">
                 <aside class="explorer-sidebar">
-                  <div class="explorer-folder is-active">Admin</div>
+                  <div class="explorer-folder" data-folder="all">All Links</div>
+                  <div class="explorer-folder" data-folder="recent">Recent</div>
+                  <div class="explorer-folder" data-folder="admin">Admin</div>
                 </aside>
                 <main class="explorer-main">
-                  <div id="explorer-admin-mount"></div>
-                  <div class="xp-statusbar">
-                    <span id="explorer-status-count">0 object(s)</span>
-                    <span class="xp-status-ready">Ready</span>
+                  <div class="explorer-credentials">
+                    <p class="explorer-hint">Tip: Open the Admin Tools window to sync links here. No server calls are made.</p>
+                    <button type="button" data-explorer-action="sync">Sync from Admin</button>
                   </div>
+                  <table class="explorer-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Shortcode</th>
+                        <th>Destination</th>
+                        <th>Modified</th>
+                      </tr>
+                    </thead>
+                    <tbody data-explorer-rows>
+                      <tr><td colspan="4">No data yet.</td></tr>
+                    </tbody>
+                  </table>
+                  <div class="explorer-actions">
+                    <button type="button" data-explorer-action="open">Open</button>
+                    <button type="button" data-explorer-action="copy">Copy URL</button>
+                    <button type="button" data-explorer-action="delete" class="danger">Delete</button>
+                  </div>
+                  <div class="explorer-status" data-explorer-status>Status: idle</div>
                 </main>
               </div>
             </div>
+          <div class="xp-resize-handle xp-resize-e" aria-hidden="true"></div>
+          <div class="xp-resize-handle xp-resize-s" aria-hidden="true"></div>
+          <div class="xp-resize-handle xp-resize-se" aria-hidden="true"></div>
           </div>
         </div>
       </section>

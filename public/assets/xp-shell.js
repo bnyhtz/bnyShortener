@@ -6,6 +6,7 @@
   const windowArea = document.getElementById('xp-window-area');
   const icons = document.querySelectorAll('.xp-icon');
   const isMobile = matchMedia('(max-width: 768px)').matches || matchMedia('(pointer: coarse)').matches;
+  const EDGE_PADDING = 12;
 
   function initClock() {
     const clock = document.getElementById('xp-clock');
@@ -51,6 +52,7 @@
         if (btn.dataset.task !== id) btn.classList.remove('is-active');
       });
     }
+    clampWindow(ref);
   }
 
   function minimizeWindow(id) {
@@ -68,7 +70,16 @@
       ref.classList.add('is-mobile');
       return;
     }
-    ref.classList.toggle('is-maximized');
+    const isMax = ref.classList.toggle('is-maximized');
+    if (isMax) {
+      const area = workArea();
+      ref.style.left = `${EDGE_PADDING}px`;
+      ref.style.top = `${EDGE_PADDING}px`;
+      ref.style.width = `${area.width - EDGE_PADDING * 2}px`;
+      ref.style.height = `${area.height - EDGE_PADDING * 2}px`;
+    } else {
+      clampWindow(ref);
+    }
   }
 
   function closeWindow(id) {
@@ -88,6 +99,91 @@
     });
     win.style.zIndex = maxZ + 1;
     win.classList.add('xp-active');
+  }
+
+  function workArea() {
+    const taskbarEl = document.getElementById('xp-taskbar');
+    const taskbarHeight = taskbarEl ? taskbarEl.offsetHeight : 48;
+    return {
+      width: window.innerWidth,
+      height: window.innerHeight - taskbarHeight,
+    };
+  }
+
+  function clampWindow(win) {
+    if (!win || win.classList.contains('is-maximized')) return;
+    const area = workArea();
+    const rect = win.getBoundingClientRect();
+    const maxLeft = Math.max(EDGE_PADDING, area.width - rect.width - EDGE_PADDING);
+    const maxTop = Math.max(EDGE_PADDING, area.height - rect.height - EDGE_PADDING);
+    const left = Math.min(Math.max(rect.left, EDGE_PADDING), maxLeft);
+    const top = Math.min(Math.max(rect.top, EDGE_PADDING), maxTop);
+    win.style.left = `${left}px`;
+    win.style.top = `${top}px`;
+  }
+
+  function attachResize(win) {
+    const minWidth = 420;
+    const minHeight = 280;
+    const startResize = (dir, e) => {
+      if (win.classList.contains('is-maximized')) return;
+      focusWindow(win);
+      e.preventDefault();
+      const area = workArea();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const rect = win.getBoundingClientRect();
+      const startWidth = rect.width;
+      const startHeight = rect.height;
+      const startLeft = rect.left;
+      const startTop = rect.top;
+      document.body.style.userSelect = 'none';
+
+      const onMove = (ev) => {
+        ev.preventDefault();
+        const deltaX = ev.clientX - startX;
+        const deltaY = ev.clientY - startY;
+        let newWidth = startWidth;
+        let newHeight = startHeight;
+        let newLeft = startLeft;
+        let newTop = startTop;
+
+        if (dir.includes('e')) newWidth = startWidth + deltaX;
+        if (dir.includes('s')) newHeight = startHeight + deltaY;
+
+        const maxW = area.width - EDGE_PADDING * 2;
+        const maxH = area.height - EDGE_PADDING * 2;
+        newWidth = Math.min(Math.max(newWidth, minWidth), maxW);
+        newHeight = Math.min(Math.max(newHeight, minHeight), maxH);
+
+        const maxLeft = Math.max(EDGE_PADDING, area.width - newWidth - EDGE_PADDING);
+        const maxTop = Math.max(EDGE_PADDING, area.height - newHeight - EDGE_PADDING);
+        newLeft = Math.min(Math.max(newLeft, EDGE_PADDING), maxLeft);
+        newTop = Math.min(Math.max(newTop, EDGE_PADDING), maxTop);
+
+        win.style.width = `${newWidth}px`;
+        win.style.height = `${newHeight}px`;
+        win.style.left = `${newLeft}px`;
+        win.style.top = `${newTop}px`;
+      };
+
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        document.body.style.userSelect = '';
+        clampWindow(win);
+      };
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    };
+
+    ['e', 's', 'se'].forEach(dir => {
+      const h = win.querySelector(`.xp-resize-${dir}`);
+      if (h) {
+        h.addEventListener('mousedown', (e) => startResize(dir, e));
+      }
+    });
   }
 
   function setupWindow(win) {
@@ -133,6 +229,7 @@
         dragging = false;
         document.removeEventListener('mousemove', onMove);
         document.removeEventListener('mouseup', onUp);
+        clampWindow(win);
       };
 
       handle.addEventListener('mousedown', (e) => {
@@ -148,6 +245,16 @@
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onUp);
       });
+    }
+    if (!isMobile) {
+      ['e', 's', 'se'].forEach(dir => {
+        if (!win.querySelector(`.xp-resize-${dir}`)) {
+          const handleEl = document.createElement('div');
+          handleEl.className = `xp-resize-handle xp-resize-${dir}`;
+          win.appendChild(handleEl);
+        }
+      });
+      attachResize(win);
     }
   }
 
@@ -298,6 +405,9 @@
       openWindow('mainWindow');
       runDevGuard();
       enhanceExplorerAdmin();
+      window.addEventListener('resize', () => {
+        Object.values(windows).forEach(clampWindow);
+      });
       window.XPShell = {
         open: openWindow,
         close: closeWindow,
@@ -313,6 +423,9 @@
     openWindow('mainWindow');
     runDevGuard();
     enhanceExplorerAdmin();
+    window.addEventListener('resize', () => {
+      Object.values(windows).forEach(clampWindow);
+    });
     window.XPShell = {
       open: openWindow,
       close: closeWindow,

@@ -123,7 +123,7 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  position: relative;
+  position: absolute;
 }
 
 .xp-window.is-mobile {
@@ -169,9 +169,56 @@ textarea:focus-visible {
   font-weight: 700;
 }
 
+.xp-titlebar-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.xp-titlebar-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  margin-right: 6px;
+}
+
 .xp-window-controls {
   display: flex;
   gap: 0.25rem;
+}
+
+.xp-resize-handle {
+  position: absolute;
+  background: transparent;
+  z-index: 5;
+}
+
+.xp-resize-e {
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: ew-resize;
+}
+
+.xp-resize-s {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  cursor: ns-resize;
+}
+
+.xp-resize-se {
+  width: 14px;
+  height: 14px;
+  right: 0;
+  bottom: 0;
+  cursor: nwse-resize;
+}
+
+.xp-window.is-maximized .xp-resize-handle {
+  display: none;
 }
 
 .xp-winbtn {
