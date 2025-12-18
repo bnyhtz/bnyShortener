@@ -12,10 +12,10 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--xp-window, #ffffff);
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
   width: 90%;
   max-width: 500px;
   max-height: 90vh;

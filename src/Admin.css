@@ -11,8 +11,9 @@
 .filters {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background-color: #f9f9f9;
+  background-color: var(--xp-window, #f9f9f9);
   border-radius: 8px;
+  border: 1px solid #d6d6d6;
 }
 
 .domain-filter-buttons {
@@ -35,29 +36,29 @@
 }
 
 .filter-button.active {
-  background-color: var(--primary-color);
+  background-color: var(--xp-accent, #ff996c);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--xp-accent, #ff996c);
 }
 
 .table-responsive {
   overflow-x: auto;
-  border: 1px solid #E9EDF1;
+  border: 1px solid #d6d6d6;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
 }
 
 .links-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 0; /* Removed margin as it's on the container now */
+  margin-top: 0;
 }
 
 .links-table th,
 .links-table td {
   padding: 1rem 1.5rem;
   text-align: left;
-  border-bottom: 1px solid #E9EDF1;
+  border-bottom: 1px solid #d6d6d6;
   white-space: nowrap;
 }
 
@@ -66,16 +67,16 @@
 }
 
 .links-table th {
-  background-color: #F8F9FC;
+  background-color: #f7f7f7;
   font-weight: 700;
-  color: #5F6368;
+  color: #102548;
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.5px;
 }
 
 .links-table td a {
-  color: #0056FF;
+  color: var(--xp-accent-dark, #e77f55);
   text-decoration: none;
   font-weight: 500;
 }
@@ -95,11 +96,7 @@
 }
 
 button.danger {
-  background-color: #d93025;
-}
-
-button.danger:hover {
-  background-color: #c5221f;
+  color: #fff;
 }
 
 /* Responsive Styles */
@@ -128,9 +125,9 @@ button.danger:hover {
 
   .links-table tr {
     margin-bottom: 1rem;
-    border: 1px solid #E9EDF1;
+    border: 1px solid #d6d6d6;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
 
   .links-table td {
@@ -139,7 +136,7 @@ button.danger:hover {
     align-items: flex-start;
     padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid #E9EDF1;
+    border-bottom: 1px solid #d6d6d6;
     word-break: break-all;
   }
   
@@ -174,13 +171,14 @@ button.danger:hover {
   }
   
   .select-wrapper::after {
-    content: '▼';
+    content: 'v';
     font-size: 0.8rem;
     position: absolute;
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
+    color: #102548;
   }
   
   #domain-filter {

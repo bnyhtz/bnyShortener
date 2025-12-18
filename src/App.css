@@ -1,8 +1,8 @@
 .container {
   width: 100%;
   max-width: 800px;
-  margin: 0 1rem;
-  padding-bottom: 4rem;
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
 }
 
 .header {
@@ -13,9 +13,10 @@
 }
 
 .card {
-  background-color: #ffffff;
+  background-color: var(--xp-window, #ffffff);
+  border: 1px solid #d6d6d6;
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
   padding: 2rem;
   margin-bottom: 1.5rem;
 }
@@ -26,7 +27,7 @@
   align-items: center;
   padding-bottom: 1rem;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid #E9EDF1;
+  border-bottom: 1px solid #d1d1d1;
 }
 
 .card-header.collapsible {
@@ -53,7 +54,7 @@
 
 .setting-item label {
   font-weight: 700;
-  color: #0B1A3D;
+  color: #102548;
 }
 
 /* The switch - https://www.w3schools.com/howto/howto_css_switch.asp */
@@ -78,7 +79,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: #b1b1b1;
   transition: .4s;
   border-radius: 28px;
 }
@@ -96,11 +97,11 @@
 }
 
 input:checked + .slider {
-  background-color: #0056FF;
+  background-color: var(--xp-accent, #ff996c);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #0056FF;
+  box-shadow: 0 0 1px var(--xp-accent, #ff996c);
 }
 
 input:checked + .slider:before {
@@ -122,22 +123,22 @@ input:checked + .slider:before {
   margin-bottom: 0.5rem;
   font-weight: 700;
   font-size: 0.875rem;
-  color: #566280;
+  color: #102548;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem 1rem;
   font-size: 1rem;
-  border: 1px solid #A5B1C9;
+  border: 1px solid #9ca5b5;
   border-radius: 4px;
   box-sizing: border-box;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-group input:focus {
-  border-color: #0056FF;
-  box-shadow: 0 0 0 3px rgba(0, 86, 255, 0.2);
+  border-color: var(--xp-accent, #ff996c);
+  box-shadow: 0 0 0 3px var(--xp-focus, rgba(255, 153, 108, 0.2));
   outline: none;
 }
 
@@ -150,15 +151,15 @@ input:checked + .slider:before {
 .short-link-group .domain-select {
   flex-shrink: 0;
   padding: 0.75rem 1rem;
-  border: 1px solid #A5B1C9;
+  border: 1px solid #9ca5b5;
   border-radius: 4px;
-  background-color: #F8F9FC;
+  background-color: #f8f8f8;
   font-weight: 700;
-  color: #0B1A3D;
+  color: #102548;
 }
 
 .short-link-group span {
-  color: #A5B1C9;
+  color: #9ca5b5;
 }
 
 .custom-path-group {
@@ -178,62 +179,47 @@ input:checked + .slider:before {
   align-items: center;
   gap: 1rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #E9EDF1;
+  border-top: 1px solid #d1d1d1;
 }
 
 button.primary {
-  background-color: #0056FF;
-  color: #ffffff;
-}
-
-button.primary:hover {
-  background-color: #0045cc;
+  cursor: pointer;
 }
 
 button.primary:disabled {
-  background-color: #A5B1C9;
   cursor: not-allowed;
 }
 
-button.secondary {
-  background-color: transparent;
-  color: #566280;
-  border: none;
-}
-
-button.secondary:hover {
-  color: #0B1A3D;
-}
-
 .error {
-  color: #d93025;
-  background-color: #fbe9e7;
+  color: #8c2f1c;
+  background-color: #ffe5dd;
   padding: 1rem;
   border-radius: 4px;
   margin-top: 1.5rem;
   font-weight: 500;
   text-align: left;
+  border: 1px solid #ff9f84;
 }
 
 .result {
   margin-top: 2rem;
   padding: 1.5rem;
   border-radius: 8px;
-  background-color: #F8F9FC;
-  border: 1px solid #E9EDF1;
+  background-color: #f8f8f8;
+  border: 1px solid #d6d6d6;
   text-align: left;
 }
 
 .result p {
   margin: 0 0 0.75rem 0;
   font-weight: 700;
-  color: #0B1A3D;
+  color: #102548;
 }
 
 .result a {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #0056FF;
+  color: var(--xp-accent-dark, #e77f55);
   word-break: break-all;
   text-decoration: none;
 }
@@ -272,23 +258,13 @@ button.secondary:hover {
 }
 
 .result-buttons .button.primary {
-  background-color: #0056FF;
   color: #ffffff;
-}
-
-.result-buttons .button.primary:hover {
-  background-color: #0045cc;
 }
 
 .result-buttons .button.secondary {
   background-color: #ffffff;
-  color: #566280;
-  border-color: #A5B1C9;
-}
-
-.result-buttons .button.secondary:hover {
-  color: #0B1A3D;
-  background-color: #F8F9FC;
+  color: #102548;
+  border-color: #9ca5b5;
 }
 
 .setting-label-group {
@@ -305,14 +281,14 @@ button.secondary:hover {
 .cloaking-note {
   font-size: 0.8rem;
   font-weight: 400;
-  color: #566280;
+  color: #4a5a70;
   margin: 0;
   text-align: left;
 }
 
 .validation-error {
   font-size: 0.8rem;
-  color: #d93025;
+  color: #8c2f1c;
   margin-top: 0.5rem;
   text-align: left;
 }
@@ -323,9 +299,9 @@ button.secondary:hover {
   margin: 2rem auto;
   padding: 2.5rem;
   text-align: center;
-  background-color: #ffffff;
+  background-color: var(--xp-window, #ffffff);
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
   box-sizing: border-box;
 }
 
@@ -335,7 +311,7 @@ button.secondary:hover {
 
 .login-card p {
   margin-bottom: 2rem;
-  color: #566280;
+  color: #4a5a70;
 }
 
 @media (max-width: 600px) {

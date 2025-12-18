@@ -89,7 +89,16 @@ function Admin() {
   };
 
   const handleDelete = async (key) => {
-    if (!window.confirm(`Are you sure you want to delete the link "${key}"?`)) {
+    if (window.XPModal) {
+      const ok = await window.XPModal.confirm({
+        title: 'Delete link',
+        message: `Delete the link "${key}"?`,
+        icon: 'warning',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+      });
+      if (!ok) return;
+    } else if (!window.confirm(`Are you sure you want to delete the link "${key}"?`)) {
       return;
     }
     try {

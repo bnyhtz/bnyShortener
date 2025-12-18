@@ -17,3 +17,12 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </StrictMode>,
 );
+
+const explorerAdmin = document.getElementById('explorer-admin-mount');
+if (explorerAdmin && window.location.pathname !== '/admin') {
+  createRoot(explorerAdmin).render(
+    <StrictMode>
+      <Admin />
+    </StrictMode>,
+  );
+}

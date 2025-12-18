@@ -6,11 +6,98 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Link Shortener</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>bnyShortener</title>
+    <link rel="stylesheet" href="/assets/xp-theme.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="xp-desktop" class="xp-desktop">
+      <div id="xp-icons" class="xp-icons">
+        <button class="xp-icon" data-open="mainWindow" aria-label="Open Link Shortener">
+          <img src="/assets/icons/link.svg" alt="" class="xp-icon-img" />
+          <span>Link Shortener</span>
+        </button>
+        <button class="xp-icon" data-open="explorerWindow" aria-label="Open Link Explorer">
+          <img src="/assets/icons/folder.svg" alt="" class="xp-icon-img" />
+          <span>Link Explorer</span>
+        </button>
+      </div>
+
+      <section id="xp-window-area" class="xp-window-area">
+        <div class="xp-window" data-window="mainWindow">
+          <div class="xp-titlebar" data-drag-handle>
+            <div class="xp-title">Link Shortener</div>
+            <div class="xp-window-controls">
+              <button class="xp-winbtn" data-action="minimize" aria-label="Minimize">_</button>
+              <button class="xp-winbtn" data-action="maximize" aria-label="Maximize">[ ]</button>
+              <button class="xp-winbtn xp-close" data-action="close" aria-label="Close">X</button>
+            </div>
+          </div>
+
+          <div class="xp-window-body">
+            <div id="APP_ROOT_DO_NOT_CHANGE">
+              <div id="xp-app-scope" class="xp-scope">
+                <div id="root"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="xp-window is-hidden" data-window="explorerWindow">
+          <div class="xp-titlebar" data-drag-handle>
+            <div class="xp-title">
+              <img src="/assets/icons/folder.svg" alt="" class="xp-title-icon" />
+              Link Explorer
+            </div>
+            <div class="xp-window-controls">
+              <button class="xp-winbtn" data-action="minimize" aria-label="Minimize">_</button>
+              <button class="xp-winbtn" data-action="maximize" aria-label="Maximize">[ ]</button>
+              <button class="xp-winbtn xp-close" data-action="close" aria-label="Close">X</button>
+            </div>
+          </div>
+          <div class="xp-window-body">
+            <div class="xp-scope explorer-shell">
+              <div class="explorer-toolbar">
+                <div class="explorer-buttons">
+                  <button type="button" class="btn back" disabled>◀</button>
+                  <button type="button" class="btn forward" disabled>▶</button>
+                  <button type="button" class="btn up" disabled>⬆</button>
+                  <button type="button" class="btn refresh" data-explorer-action="refresh">Refresh</button>
+                </div>
+                <div class="explorer-address">
+                  <label>Address</label>
+                  <input type="text" readonly value="C:\\Links\\All Links" />
+                </div>
+                <div class="explorer-filter-slot" id="explorer-filter-slot"></div>
+              </div>
+              <div class="explorer-body">
+                <aside class="explorer-sidebar">
+                  <div class="explorer-folder is-active">Admin</div>
+                </aside>
+                <main class="explorer-main">
+                  <div id="explorer-admin-mount"></div>
+                  <div class="xp-statusbar">
+                    <span id="explorer-status-count">0 object(s)</span>
+                    <span class="xp-status-ready">Ready</span>
+                  </div>
+                </main>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer id="xp-taskbar" class="xp-taskbar">
+        <button id="xp-start" class="xp-start" aria-haspopup="true" aria-expanded="false">Start</button>
+        <div id="xp-taskbar-items" class="xp-taskbar-items"></div>
+        <div class="xp-tray">
+          <span id="xp-clock"></span>
+        </div>
+      </footer>
+    </div>
+
+    <script src="/assets/xp-modals.js" defer></script>
+    <script src="/assets/xp-shell.js" defer></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
